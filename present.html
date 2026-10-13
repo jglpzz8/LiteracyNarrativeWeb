@@ -99,4 +99,4 @@ $('#fin').onclick=async()=>{closeAll();go(LAB.x,LAB.y,P.a);const en=$('#en'),et=
  for(const l of ['This is what learning looks like for me right now.','Not a finished collection of things I know.','But a collection of things I’m trying to understand, build, and become capable of.','Some of them will work. Some will change. Some may never be finished.','And tomorrow, there will probably be something new to learn.']){if(en.hidden)return;et.insertAdjacentHTML('beforeend','<p>'+l+'</p>');if(!rm&&!skip)await new Promise(r=>setTimeout(r,2600))}
  et.insertAdjacentHTML('beforeend','<p><a href="'+NEXT+'">Continue →</a> &nbsp; <button id="eb">back to the lab</button></p>');$('#eb').onclick=closeAll};
 requestAnimationFrame(frame);
-</script></body></html>
+</script><script src="assets/background-music.js" data-track="assets/present.mp3" defer></script></body></html>

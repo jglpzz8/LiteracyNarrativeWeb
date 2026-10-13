@@ -19,7 +19,7 @@ body.redmode{--bg:#f0eded}body.redmode .top{border-bottom-color:#dfc9ca}
 @media(max-width:760px){.wrap{margin-top:22px;padding:0 12px 40px}.head,.activity-head{flex-direction:column}.tag{display:none}.panel{padding:16px}.taskrow{gap:9px}.taskrow .btn{min-width:auto;padding:9px}.taskinfo small{display:block}.sidegrade{position:static;width:auto;display:flex;align-items:center;gap:12px;margin:0 12px 12px}.grade{font-size:23px;margin:0}.sidegrade .grade-note{margin-left:auto}.final-layout{padding-right:0}.whisper{bottom:9%;font-size:12px}}
 @media(prefers-reduced-motion:reduce){.whisper{transition-duration:.01ms}}
 
-/* MEMORY FRAGMENTS (final assessment): optional photos from Assets/, never interactive */
+/* MEMORY FRAGMENTS (final assessment): optional photos from assets/, never interactive */
 .memory{position:fixed;z-index:2;pointer-events:none;width:clamp(110px,15vw,200px);bottom:26vh;background:#fff;border:6px solid #fff;box-shadow:0 1px 10px rgba(40,48,58,.14);opacity:0;filter:grayscale(.85) blur(3px);transform:translateY(6px);transition:opacity 3.2s ease,filter 3.2s ease,transform 3.2s ease}
 .memory.left{left:2.5vw}.memory.right{right:2.5vw}
 .memory img{display:block;width:100%;height:auto;max-height:28vh;object-fit:cover}
@@ -110,8 +110,8 @@ function hideWhisper(){clearTimeout(whisperTimer);$('whisper').classList.remove(
 
 // ===== MEMORY FRAGMENTS =====
 // Optional photos shown as slow fades during the final assessment. Missing files are simply ignored.
-// To add photos: save them as Assets/<kind>_NN.jpg (NN = 01..08) next to this file. No code changes needed.
-const MEMORY_DIR='Assets/', MEMORY_EXT=['jpg'];                       // add 'png' / 'jpeg' here if needed
+// To add photos: save them as assets/<kind>_NN.jpg (NN = 01..08). No code changes needed.
+const MEMORY_DIR='assets/', MEMORY_EXT=['jpg'];                       // add 'png' / 'jpeg' here if needed
 const MEMORY_KINDS={childhood:{prefix:'childhood_',max:8},schoolwork:{prefix:'schoolwork_',max:8},diploma:{prefix:'diploma_',max:8}};
 // Which kinds appear in each phase. early = grades still green (attempts 0-2). late = grades falling (attempts 3-6).
 const MEMORY_STAGES={early:{kinds:['childhood'],tone:'warm'},late:{kinds:['schoolwork','diploma'],tone:'cool'}};
@@ -152,4 +152,4 @@ $('answerButton').onclick=()=>{
 probeMemories();
 renderDashboard();
 })();
-</script></body></html>
+</script><script src="assets/background-music.js" data-track="assets/school.mp3" defer></script></body></html>
