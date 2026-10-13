@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PRESENT.exe — The Learning Loop</title><style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#080a09;color:#e6c26a;font:13px/1.5 "Courier New",monospace}
+#cv{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;touch-action:none;cursor:pointer}
+#top{position:fixed;top:0;left:0;right:0;padding:8px 12px;display:flex;justify-content:space-between;gap:10px;pointer-events:none;text-shadow:0 0 6px #000,0 0 2px #000}#top b{letter-spacing:.1em}#top span{color:#9fb;text-align:right}
+#nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:6px;padding:6px;background:#0b0f0dd9;border-top:1px solid #3a4a40;overflow-x:auto;z-index:5}
+button{font:inherit;color:#e6c26a;background:#12170f;border:1px solid #6b7a4a;padding:5px 10px;cursor:pointer;white-space:nowrap}button:hover{background:#1c2417}:focus-visible{outline:2px solid #3ff;outline-offset:2px}button[aria-pressed=true],button.on{background:#e6c26a;color:#111}
+#pn{position:fixed;left:50%;bottom:50px;transform:translateX(-50%);width:min(580px,96vw);max-height:60vh;overflow:auto;background:#0b0f0df2;border:1px solid #6b7a4a;box-shadow:0 0 0 3px #080a09,0 0 24px #000;padding:12px 14px;z-index:6}#pn[hidden],#en[hidden]{display:none}
+#pn h2{margin:0 0 6px;font-size:14px;color:#9fb;letter-spacing:.06em}#pn p{margin:8px 0}#pn pre{background:#050705;border:1px solid #2b3626;padding:8px;overflow:auto;margin:8px 0;color:#bfe3b0;white-space:pre-wrap}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.q{color:#fff;font-style:italic}.bad{color:#f66;text-decoration:underline}.part{border-style:dashed}.part.ok{border-style:solid;color:#9fb}.part.imag{border-style:solid;color:#6df}
+.fr{border:1px solid #6b7a4a;padding:8px;width:31%;min-width:90px;font-size:12px}
+#en{position:fixed;inset:0;z-index:8;background:#050705d9;display:flex;align-items:center;justify-content:center;padding:20px}#en div{max-width:560px;font-size:15px}#en p{margin:12px 0;animation:fi 2s both}@keyframes fi{from{opacity:0}}#en a{color:#9fb}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<canvas id="cv" aria-label="A small pseudo-3D laboratory. Use the buttons below to visit any station."></canvas>
+<div id="top"><b>PRESENT.exe</b><span id="hint">tap a station · drag to look around · or use the buttons</span></div>
+<nav id="nav" aria-label="Stations"><button data-s="0">A · SOFTWARE</button><button data-s="1">B · ROBOTICS</button><button data-s="2">C · RESEARCH</button><button data-s="3">D · FOUNDATIONS</button><button data-s="4">E · CREATIVE</button><button id="lab">LAB VIEW</button><button id="fin">FINISH →</button></nav>
+<section id="pn" hidden role="dialog" aria-labelledby="pt"><h2 id="pt"></h2><div id="pb"></div><div class="row"><button id="bk">← back to the lab</button></div></section>
+<section id="en" hidden role="dialog" aria-label="Ending"><div id="et"></div></section>
+<script>
+const NEXT='lifelong.html'; // CHANGE THIS to your LIFELONG LEARNING file
+const $=s=>document.querySelector(s),R=Math.random,rm=matchMedia('(prefers-reduced-motion:reduce)').matches,cv=$('#cv'),g=cv.getContext('2d');
+// ===== MAP + CAMERA (digits = wall styles) =====
+const M=['2222211111','3000000001','3000000001','3000000002','1000000002','1000000002','1000000003','1000000003','1000000001','1122222111'];
+const wall=(x,y)=>(M[y|0]||'1')[x|0]!=='0'&&(M[y|0]||'1')[x|0]!==undefined;
+const LAB={x:5,y:7.6,a:-1.57},P={...LAB};let W,H,zb=[];
+function size(){if(innerWidth/innerHeight<1.1){W=200;H=130;cv.style.cssText='top:34px;bottom:auto;height:'+innerWidth*H/W+'px'}else{H=innerWidth<700?120:170;W=Math.round(H*innerWidth/innerHeight);cv.style.cssText=''}cv.width=W;cv.height=H;zb=new Array(W)}addEventListener('resize',size);size();
+function cast(x,y,dx,dy){let mx=x|0,my=y|0,ddx=Math.abs(1/dx),ddy=Math.abs(1/dy),sx=dx<0?-1:1,sy=dy<0?-1:1,sdx=(dx<0?x-mx:mx+1-x)*ddx,sdy=(dy<0?y-my:my+1-y)*ddy,side=0;
+ for(let i=0;i<40;i++){if(sdx<sdy){sdx+=ddx;mx+=sx;side=0}else{sdy+=ddy;my+=sy;side=1}if(wall(mx,my))break}
+ const d=side?sdy-ddy:sdx-ddx,wx=side?x+d*dx:y+d*dy;return{d,side,t:(M[my]||'1')[mx]||'1',u:wx-Math.floor(wx)}}
+// ===== STATION SPRITES (drawn with code, no image files) =====
+const ST=[{n:'A',x:2.6,y:3.6},{n:'B',x:7.4,y:3.6},{n:'C',x:6.4,y:2},{n:'D',x:3.6,y:2},{n:'E',x:5,y:4.4}];
+function spr(f){const c=document.createElement('canvas');c.width=c.height=64;const q=c.getContext('2d');f(q,(x,y,w,h,col)=>{q.fillStyle=col;q.fillRect(x,y,w,h)});return c}
+ST[0].s=spr((q,r)=>{r(8,6,48,38,'#2a2d2a');r(12,10,40,28,'#06180c');for(let i=0;i<6;i++)r(15,13+i*4,10+(i*7)%22,2,i==4?'#f66':'#5c8');r(26,44,12,6,'#2a2d2a');r(14,50,36,6,'#3a3a34')});
+ST[1].s=spr((q,r)=>{r(4,40,56,8,'#6b4a2a');r(8,48,4,14,'#4a331c');r(52,48,4,14,'#4a331c');r(18,22,22,18,'#7a8a8f');r(22,14,14,8,'#9fb');r(14,40,8,0,'#000');q.fillStyle='#222';q.beginPath();q.arc(22,40,6,0,7);q.arc(38,40,6,0,7);q.fill();r(46,34,8,6,'#e6c26a');r(8,34,6,6,'#6df')});
+ST[2].s=spr((q,r)=>{r(6,8,52,36,'#1b2326');r(10,12,44,28,'#071016');['#4c6','#6df','#e6c26a','#f66'].forEach((c,i)=>{for(let j=0;j<4;j++)r(13+j*10,16+i*6,8,4,(i*5+j*3)%7==0?'#333':c)});r(14,48,36,8,'#3a3a34')});
+ST[3].s=spr((q,r)=>{r(4,4,56,44,'#26382c');q.strokeStyle='#dfe';q.lineWidth=1.5;q.beginPath();q.moveTo(10,16);q.lineTo(30,16);q.moveTo(10,26);q.lineTo(44,22);q.moveTo(36,34);q.lineTo(54,40);q.stroke();q.fillStyle='#dfe';q.font='bold 14px monospace';q.fillText('∑ ∫',12,42);r(10,50,44,6,'#6b4a2a')});
+ST[4].s=spr((q,r)=>{r(10,20,44,26,'#2c2438');r(10,14,44,6,'#e6c26a');q.fillStyle='#e6c26a';q.font='bold 22px serif';q.fillText('♪',22,42);r(28,46,8,14,'#4a331c');r(18,58,28,4,'#4a331c')});
+// ===== RENDER =====
+let hits=[],t0=0;
+function frame(now){t0=now;const fl=rm?1:.92+.08*Math.sin(now/90+Math.sin(now/37));
+ g.fillStyle='#0a0e0c';g.fillRect(0,0,W,H/2);const fg=g.createLinearGradient(0,H/2,0,H);fg.addColorStop(0,'#0f0d09');fg.addColorStop(1,'#241d12');g.fillStyle=fg;g.fillRect(0,H/2,W,H/2);
+ const dx=Math.cos(P.a),dy=Math.sin(P.a),px=-dy*.66,py=dx*.66;
+ for(let i=0;i<W;i++){const k=2*i/W-1,r=cast(P.x,P.y,dx+px*k,dy+py*k),h=Math.min(H*3,H/r.d),y=(H-h)/2,sh=Math.max(.25,1/(1+r.d*.28))*(r.side?.7:1);zb[i]=r.d;
+  const base=r.t=='2'?[38,56,74]:r.t=='3'?[78,64,44]:[52,72,60],seam=(r.u*4)%1<.05?.55:1;g.fillStyle='rgb('+base.map(v=>v*sh*seam|0)+')';g.fillRect(i,y,1,h+1);
+  if(r.t=='2'&&r.u%.25>.06&&r.u%.25<.2){g.fillStyle='rgba(120,255,190,'+.22*sh*fl+')';g.fillRect(i,y+h*.35,1,h*.25)}if(r.t=='3'&&r.u>.2&&r.u<.8){g.fillStyle='rgba(255,230,160,'+.1*sh+')';g.fillRect(i,y+h*.3,1,h*.3)}}
+ hits=[];const iv=1/(px*dy-dx*py);
+ ST.map((s,i)=>({s,i,d:(s.x-P.x)**2+(s.y-P.y)**2})).sort((a,b)=>b.d-a.d).forEach(({s,i})=>{const sx=s.x-P.x,sy=s.y-P.y,tx=iv*(dy*sx-dx*sy),ty=iv*(-py*sx+px*sy);if(ty<.25)return;
+  const cx=W/2*(1+tx/ty),sz=H/ty*.8,bot=H/2+H/ty/2,x0=cx-sz/2;g.globalAlpha=fl;
+  for(let c=Math.max(0,x0|0);c<Math.min(W,x0+sz);c++)if(ty<zb[c])g.drawImage(s.s,(c-x0)/sz*64,0,1,64,c,bot-sz,1,sz);g.globalAlpha=1;
+  hits.push({i,x0,x1:x0+sz,y0:bot-sz,y1:bot,ty});const fs=Math.max(7,H/17);g.font='bold '+fs+'px monospace';g.fillStyle='#9fb';g.textAlign='center';g.fillText(s.n,cx,bot-sz-fs*.4);g.textAlign='left'});
+ requestAnimationFrame(frame)}
+// ===== MOVEMENT (tap/click, drag to look, optional keys) =====
+let tw=null;
+function go(x,y,a,cb){const f={x:P.x,y:P.y,a:P.a},d=((a-f.a+Math.PI*3)%(Math.PI*2))-Math.PI;if(rm){P.x=x;P.y=y;P.a=f.a+d;cb&&cb();return}tw={f,x,y,d,t:performance.now(),cb}}
+setInterval(()=>{if(!tw)return;const k=Math.min(1,(performance.now()-tw.t)/850),e=k*k*(3-2*k);P.x=tw.f.x+(tw.x-tw.f.x)*e;P.y=tw.f.y+(tw.y-tw.f.y)*e;P.a=tw.f.a+tw.d*e;if(k>=1){const c=tw.cb;tw=null;c&&c()}},16);
+function visit(i){closeAll();const s=ST[i],ux=5-s.x,uy=5-s.y,l=Math.hypot(ux,uy),sx=s.x+ux/l*1.7,sy=s.y+uy/l*1.7;go(sx,sy,Math.atan2(s.y-sy,s.x-sx),()=>open(i))}
+let dn=null,moved=0;
+cv.onpointerdown=e=>{dn={x:e.clientX,a:P.a};moved=0;cv.setPointerCapture(e.pointerId)};
+cv.onpointermove=e=>{if(!dn)return;const d=e.clientX-dn.x;if(Math.abs(d)>6)moved=1;if(moved){tw=null;P.a=dn.a+d/innerWidth*2.4}};
+cv.onpointerup=e=>{const was=moved;dn=null;if(was)return;const r=cv.getBoundingClientRect(),X=(e.clientX-r.x)/r.width*W,Y=(e.clientY-r.y)/r.height*H;
+ const h=hits.filter(h=>X>=h.x0-4&&X<=h.x1+4&&Y>=h.y0-4&&Y<=h.y1+4).sort((a,b)=>a.ty-b.ty)[0];if(h){visit(h.i);return}
+ closeAll();const k=2*X/W-1,ang=P.a+Math.atan(k*.66),c=cast(P.x,P.y,Math.cos(ang),Math.sin(ang)),w=Math.max(0,Math.min(2.2,c.d-.8));go(P.x+Math.cos(ang)*w,P.y+Math.sin(ang)*w,ang)};
+addEventListener('keydown',e=>{if(e.key=='Escape')return closeAll();if(!$('#pn').hidden||!$('#en').hidden)return;const m={ArrowLeft:[0,-.12],ArrowRight:[0,.12],ArrowUp:[.25,0],ArrowDown:[-.25,0],a:[0,-.12],d:[0,.12],w:[.25,0],s:[-.25,0]}[e.key];if(!m)return;tw=null;P.a+=m[1];const nx=P.x+Math.cos(P.a)*m[0],ny=P.y+Math.sin(P.a)*m[0];if(!wall(nx,P.y))P.x=nx;if(!wall(P.x,ny))P.y=ny});
+// ===== PANELS =====
+const pn=$('#pn'),pb=$('#pb');let cur=-1;
+function closeAll(){pn.hidden=true;$('#en').hidden=true;cur=-1}
+$('#bk').onclick=()=>{closeAll();go(LAB.x,LAB.y,P.a)};$('#lab').onclick=()=>{closeAll();go(LAB.x,LAB.y,LAB.a)};
+document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>visit(+b.dataset.s));
+const T=[['A · SOFTWARE ENGINEERING','<p class="q">Understanding the idea was only the beginning.</p><div class="row"><button data-a="f0" class="on">pathfinder.js</button><button data-a="f1">grid.js</button><button data-a="run">run tests</button></div><pre id="co"></pre><p>Knowing what something should do is different from knowing how to make it do it.</p>'],
+['B · ROBOTICS & INVENTION','<p class="q">I can imagine what it should do. I’m still learning how to make it happen.</p><div class="row" id="pt2"></div><p id="pi">Tap a part.</p><div class="row"><button data-a="view" id="vw" aria-pressed="false">show the imagined design</button></div>'],
+['C · RESEARCH & EXPERIMENTS','<p>A toy experiment: text → DNA-like letters (A C G T) → damage → recovery by keeping 3 copies and voting. A small simulation, not molecular biology.</p><div class="row"><button data-a="c0">original</button><button data-a="c1">damaged copy</button><button data-a="c2">recovered</button><button data-a="c3">run again</button></div><pre id="cr"></pre><p id="cl"></p><p class="q">A failed experiment is still information about the problem. Sometimes the result doesn’t answer the question. It helps me ask a better one.</p>'],
+['D · FOUNDATIONS','<p class="q">There are things I cannot build yet. That is part of why I am here.</p><div class="row"><button data-a="n0">trigonometry</button><button data-a="n1">graph theory</button><button data-a="n2">information theory</button></div><p id="np">Pick a note.</p><p>Optional: turn the angle. This is the math that turns the camera in this room.</p><input id="an" type="range" min="0" max="360" value="40" aria-label="angle" style="width:100%"><svg width="90" height="90" viewBox="-45 -45 90 90" aria-hidden="true"><circle r="40" fill="none" stroke="#6b7a4a"/><line id="ln" x1="0" y1="0" x2="30" y2="-26" stroke="#e6c26a" stroke-width="2"/></svg> <span id="tr"></span>'],
+['E · CREATIVE EXPERIMENTS','<p class="q">Not everything I learn needs to become useful. Some things are worth understanding simply because they make the world more interesting.</p><div class="row"><button data-a="e0">a script page</button><button data-a="e1">a storyboard</button><button data-a="e2">a melody</button></div><div id="ep"></div>']];
+const CODE=['function shortestPath(grid, a, b) {\n  const queue = [[a]], seen = new Set([key(a)]);\n  while (queue.length) {\n    const path = queue.shift();\n    const [x, y] = path[path.length - 1];\n    if (x === b[0] && y === b[1]) return path;\n    for (const [dx, dy] of DIRS) { // 4 directions only, for now\n      /* ...neighbors... */\n    }\n  }\n  return null; // TODO: say *why* there is no path\n}','const DIRS = [[1,0],[-1,0],[0,1],[0,-1]];\n// TODO: diagonal moves\n// TODO: weighted cells\nconst key = ([x, y]) => x + "," + y;'];
+const PARTS=[['motor','Drives the wheels. Connected and spinning.',1],['joint','Lets the arm bend. Still on the table.',0],['controller','The small board that should decide things. Wired halfway.',0],['sensor','Should notice what’s in front of it. Not mounted yet.',0]];
+let vw=0,cp=null,cr=0;const BS='ACGT',enc=t=>[...t].map(c=>[6,4,2,0].map(s=>BS[c.charCodeAt(0)>>s&3]).join('')).join(''),dec=s=>(s.match(/.{4}/g)||[]).map(q=>{const v=[...q].reduce((a,c)=>a*4+BS.indexOf(c),0);return v>31&&v<127?String.fromCharCode(v):'?'}).join('');
+const ORIG=enc('LEARN');
+function run(){cp=[0,1,2].map(()=>[...ORIG].map(c=>R()<.12?BS[(BS.indexOf(c)+1+R()*3|0)%4]:c));cr++}
+function cshow(m){if(!cp)run();const o=[...ORIG],c1=cp[0],vote=o.map((_,i)=>{const v=cp.map(c=>c[i]),b=v.find(x=>v.filter(y=>y==x).length>1);return b||v[0]});
+ const mark=(a,s)=>a.map((ch,i)=>ch!=o[i]?'<b class="bad">['+ch+']</b>':ch).join('');
+ if(m==0)$('#cr').textContent=ORIG+'  →  "'+dec(ORIG)+'"';else if(m==1)$('#cr').innerHTML=mark(c1)+'  →  "'+dec(c1.join(''))+'"';else $('#cr').innerHTML=mark(vote)+'  →  "'+dec(vote.join(''))+'"';
+ const f=c1.filter((c,i)=>c!=o[i]).length,w=vote.filter((c,i)=>c!=o[i]).length;$('#cl').textContent='Log #'+cr+': '+f+' of 20 letters changed in copy 1. After voting, '+w+' are still wrong. '+(w?'Voting fails when the same spot is damaged in two copies.':'This time it recovered fully; the next run might not.')}
+function open(i){cur=i;$('#pt').textContent=T[i][0];pb.innerHTML=T[i][1];pn.hidden=false;
+ if(i==0)$('#co').textContent=CODE[0];if(i==1){$('#pt2').innerHTML=PARTS.map((p,j)=>'<button class="part'+(p[2]?' ok':'')+'" data-a="p'+j+'">'+p[0]+(p[2]?' ✓':' …')+'</button>').join('')}
+ if(i==2)cshow(0);if(i==3)ang();pn.scrollTop=0}
+function ang(){const v=+$('#an').value*Math.PI/180;$('#ln').setAttribute('x2',Math.cos(v)*40);$('#ln').setAttribute('y2',-Math.sin(v)*40);$('#tr').textContent='cos θ = '+Math.cos(v).toFixed(2)+'  sin θ = '+Math.sin(v).toFixed(2)}
+pn.addEventListener('input',e=>{if(e.target.id=='an')ang()});
+pn.addEventListener('click',e=>{const a=e.target.dataset.a;if(!a)return;const k=a[0],n=+a.slice(1);
+ if(a=='run'){$('#co').textContent='✓ straight corridor\n✓ around one wall\n✓ no path returns null\n✗ diagonal shortcut: expected 4 steps, got 6\n2 more tests: not written yet'}
+ else if(k=='f'){$('#co').textContent=CODE[n];e.target.parentNode.querySelectorAll('.on').forEach(b=>b.classList.remove('on'));e.target.classList.add('on')}
+ else if(a=='view'){vw=!vw;e.target.setAttribute('aria-pressed',vw);e.target.textContent=vw?'show the current state':'show the imagined design';pn.querySelectorAll('.part').forEach((b,j)=>b.classList.toggle('imag',vw&&!PARTS[j][2]))}
+ else if(k=='p'&&a!='pn'){$('#pi').textContent=PARTS[n][0]+': '+PARTS[n][1]+(vw?' (in the imagined design it works.)':'')}
+ else if(k=='c'){if(n==3){run();cshow(2)}else cshow(n)}
+ else if(k=='n'){$('#np').textContent=['Angles and vectors: how this room is drawn, and how a robot arm will someday know where it points.','Nodes and edges: the idea behind the pathfinding at station A. I only half-have it.','How much a message can lose and still be recovered: the question behind station C.'][n]}
+ else if(k=='e'){$('#ep').innerHTML=[ '<pre>INT. EMPTY STAGE — NIGHT\nA single chair. On it, a script. Page one is only a title.</pre>','<div class="row"><div class="fr">1. a chair under one light</div><div class="fr">2. a door that opens inward</div><div class="fr">3. somewhere, a sound</div></div>','<p>A melody that stops one note short.</p><div class="row">'+[1,0,1,1,0,1,0,0].map((v,j)=>'<button aria-pressed="'+!!v+'" data-a="t'+j+'">'+(j+1)+'</button>').join('')+'</div>'][n]}
+ else if(k=='t'){e.target.setAttribute('aria-pressed',e.target.getAttribute('aria-pressed')!='true')}});
+// ===== ENDING =====
+$('#fin').onclick=async()=>{closeAll();go(LAB.x,LAB.y,P.a);const en=$('#en'),et=$('#et');en.hidden=false;et.innerHTML='';let skip=0;en.onclick=()=>skip=1;
+ for(const l of ['This is what learning looks like for me right now.','Not a finished collection of things I know.','But a collection of things I’m trying to understand, build, and become capable of.','Some of them will work. Some will change. Some may never be finished.','And tomorrow, there will probably be something new to learn.']){if(en.hidden)return;et.insertAdjacentHTML('beforeend','<p>'+l+'</p>');if(!rm&&!skip)await new Promise(r=>setTimeout(r,2600))}
+ et.insertAdjacentHTML('beforeend','<p><a href="'+NEXT+'">Continue →</a> &nbsp; <button id="eb">back to the lab</button></p>');$('#eb').onclick=closeAll};
+requestAnimationFrame(frame);
+</script></body></html>

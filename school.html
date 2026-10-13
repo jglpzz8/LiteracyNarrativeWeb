@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WhiteBoard | Student Portal</title>
+<style>
+:root{--bg:#eef1f4;--paper:#fff;--ink:#29313a;--muted:#77818c;--line:#d9dee3;--blue:#526b82;--green:#4f8766;--red:#b54f54}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,Segoe UI,Arial,sans-serif}button{font:inherit;cursor:pointer}button:focus-visible{outline:2px solid #657e99;outline-offset:3px}
+.top{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,60px)}.brand{font-size:14px;font-weight:800;letter-spacing:.13em}.brand small{display:block;font-size:9px;color:#87909a;letter-spacing:.15em}.meta{font-size:10px;color:#8a939c;letter-spacing:.1em}
+.wrap{max-width:950px;margin:34px auto;padding:0 20px 50px}.crumb{font-size:10px;letter-spacing:.1em;color:#89929b;margin-bottom:15px}.head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;margin-bottom:24px}.eyebrow{font-size:10px;font-weight:800;letter-spacing:.16em;color:#828c96;margin-bottom:7px}.head h1{font-size:clamp(25px,4vw,36px);line-height:1.15;letter-spacing:-.04em;font-weight:650;margin:0 0 8px}.head p{margin:0;color:var(--muted);font-size:13px;max-width:590px}.tag{white-space:nowrap;border:1px solid var(--line);background:#f8f9fa;padding:7px 9px;border-radius:4px;font-size:10px;color:#6e7c8a}
+.panel,.activity{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:clamp(18px,4vw,28px);margin-bottom:14px}.section-title{font-size:12px;font-weight:750;margin:0 0 5px}.sub{font-size:11px;color:var(--muted);margin:0}.taskrow{display:flex;align-items:center;gap:14px;padding:17px 0;border-bottom:1px solid #edf0f2}.taskrow:last-child{border-bottom:0;padding-bottom:0}.num{height:34px;width:34px;display:grid;place-items:center;background:#eef1f4;color:#657484;border-radius:5px;font-size:11px;font-weight:800;flex-shrink:0}.taskinfo{flex:1}.taskinfo strong{font-size:12px;display:block}.taskinfo small{font-size:11px;color:var(--muted)}.status{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#87919b;border:1px solid var(--line);border-radius:4px;padding:5px 7px;white-space:nowrap}
+.btn{border:1px solid #d5dbe0;background:#fff;color:#526170;border-radius:5px;padding:10px 14px;font-size:11px;font-weight:750}.btn.primary{background:#526b82;color:#fff;border-color:#526b82}.btn:disabled{opacity:.45;cursor:default}.taskrow .btn{min-width:90px}.progressline{height:5px;background:#e6eaed;border-radius:8px;overflow:hidden;margin-top:12px}.progressfill{height:100%;width:0;background:#7b91a5;transition:none}.footer{text-align:center;color:#a1a8ae;font-size:9px;letter-spacing:.08em;padding:20px}
+.view{display:none}.view.active{display:block}.activity-head{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:22px}.activity h2{font-size:clamp(21px,3vw,28px);line-height:1.2;letter-spacing:-.035em;font-weight:650;margin:0 0 8px}.activity p{color:var(--muted);font-size:12px}.plain-label{font-size:10px;letter-spacing:.13em;color:#8a939c;font-weight:800}.task-nav{display:flex;justify-content:space-between;align-items:center;margin:4px 0 16px}.task-nav button{background:transparent;border:0;padding:5px 0;color:#6f7b86;font-size:11px}
+.board{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;min-height:180px;background:#f7f8f9;border:1px solid #e5e8eb;border-radius:5px;padding:20px}.tile{background:#fff;border:1px solid #cfd6dc;color:#586775;padding:13px 16px;border-radius:4px;min-width:125px;text-align:center;font-size:12px;user-select:none;touch-action:manipulation}.tile.selected{border-color:#8193a3;background:#edf1f4}.tile.connected{background:#e9eeea;border-color:#a7b8aa}.linkzone{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.linkitem{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8f9fa;border:1px solid #e2e6e9;border-radius:4px;font-size:11px;color:#6c7781}.linkitem button{border:0;background:transparent;color:#84909a;font-size:14px;padding:0 3px}.hint,.feedback{min-height:20px;margin-top:12px;font-size:11px;color:#7b858f}
+.question{font-size:17px;font-weight:650;line-height:1.4;margin:7px 0 20px}.choices{display:grid;gap:9px}.choice{display:flex;gap:10px;align-items:center;text-align:left;background:#fff;border:1px solid #dce1e5;padding:13px;border-radius:5px;color:#596673;font-size:12px}.choice.chosen{background:#edf1f4;border-color:#8294a4}.choice:disabled{cursor:default}.quiz-actions{margin-top:18px;display:flex;align-items:center;gap:12px}
+.final-layout{padding-right:175px}.sidegrade{position:fixed;right:max(14px,calc((100vw - 1150px)/2));top:90px;width:150px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:15px;z-index:4}.sidegrade small{font-size:9px;letter-spacing:.13em;color:#8b949c;display:block}.grade{font-size:29px;font-weight:650;letter-spacing:-.04em;margin:3px 0}.grade-note{font-size:10px;color:#88919a}.final-question{font-size:19px;font-weight:600;margin:12px 0 28px}.answerbtn{width:100%;min-height:54px;background:#f5f6f7;border:1px solid #dce1e5;border-radius:4px;color:#4f5b66;font-size:11px;font-weight:800;letter-spacing:.12em;transition:none}.answerbtn.good{background:#e3f1e7;border-color:#8cb69a;color:#376b49}.answerbtn.bad{background:#f7e3e4;border-color:#d49a9d;color:#a13f46}.result{font-size:11px;min-height:18px;margin-top:12px;color:#78838d}
+.whisper{position:fixed;left:50%;bottom:13%;transform:translate(-50%,8px);width:min(570px,82vw);text-align:center;color:#746b86;font-size:13px;font-style:italic;letter-spacing:.02em;opacity:0;pointer-events:none;transition:opacity 2.4s ease,transform 2.4s ease;z-index:3;text-shadow:0 1px 0 #fff}.whisper.show{opacity:1;transform:translate(-50%,0)}.whisper.hide{opacity:0;transform:translate(-50%,-5px)}.redmode .grade{color:var(--red)}.redmode .sidegrade{border-color:#d7a5a8}.finalend{display:none;margin-top:24px;padding:24px;border:1px solid #d8dde1;background:#fff;border-radius:6px}.finalend.show{display:block}.finalend h2{font-size:23px;margin:0 0 10px;font-weight:600}.finalend p{font-size:13px;color:#727d87;line-height:1.8}.finalend .btn{margin-top:10px}.final-end-link{display:inline-block;text-decoration:none}
+body.redmode{--bg:#f0eded}body.redmode .top{border-bottom-color:#dfc9ca}
+@media(max-width:760px){.wrap{margin-top:22px;padding:0 12px 40px}.head,.activity-head{flex-direction:column}.tag{display:none}.panel{padding:16px}.taskrow{gap:9px}.taskrow .btn{min-width:auto;padding:9px}.taskinfo small{display:block}.sidegrade{position:static;width:auto;display:flex;align-items:center;gap:12px;margin:0 12px 12px}.grade{font-size:23px;margin:0}.sidegrade .grade-note{margin-left:auto}.final-layout{padding-right:0}.whisper{bottom:9%;font-size:12px}}
+@media(prefers-reduced-motion:reduce){.whisper{transition-duration:.01ms}}
+
+/* MEMORY FRAGMENTS (final assessment): optional photos from Assets/, never interactive */
+.memory{position:fixed;z-index:2;pointer-events:none;width:clamp(110px,15vw,200px);bottom:26vh;background:#fff;border:6px solid #fff;box-shadow:0 1px 10px rgba(40,48,58,.14);opacity:0;filter:grayscale(.85) blur(3px);transform:translateY(6px);transition:opacity 3.2s ease,filter 3.2s ease,transform 3.2s ease}
+.memory.left{left:2.5vw}.memory.right{right:2.5vw}
+.memory img{display:block;width:100%;height:auto;max-height:28vh;object-fit:cover}
+.memory.warm.show{opacity:.5;filter:sepia(.25) grayscale(.45) blur(0);transform:translateY(0)}
+.memory.warm.clear{opacity:.6;filter:sepia(.15) grayscale(.1) blur(0)}
+.memory.cool.show{opacity:.5;filter:grayscale(.95) blur(0);transform:translateY(0)}
+.memory.cool.clear{opacity:.6;filter:grayscale(.7) blur(0)}
+@media(max-width:760px){.memory{width:clamp(96px,26vw,140px);bottom:24vh}}
+@media(prefers-reduced-motion:reduce){.memory{transition-duration:.8s}}
+</style></head>
+<body>
+<header class="top"><div class="brand">WHITEBOARD<small>LEARNING MANAGEMENT SYSTEM</small></div><div class="meta">STUDENT PORTAL &nbsp; / &nbsp; FALL TERM</div></header>
+<main class="wrap">
+  <section class="view active" id="dashboard">
+    <div class="crumb">STUDENT PORTAL &nbsp; / &nbsp; DASHBOARD</div>
+    <div class="head"><div><div class="eyebrow">STUDENT WORKSPACE</div><h1>Good afternoon.</h1><p>You have three required activities remaining in your Learning Foundations module. Complete each activity to continue.</p></div><div class="tag">TERM ACTIVE</div></div>
+    <section class="panel"><h2 class="section-title">Module completion</h2><p class="sub" id="progressText">0 of 3 activities completed</p><div class="progressline"><div class="progressfill" id="fill"></div></div></section>
+    <section class="panel"><div class="eyebrow">REQUIRED COURSEWORK</div><h2 class="section-title">Learning Foundations</h2><p class="sub">Please complete activities in the assigned order.</p>
+      <div class="taskrow"><div class="num">01</div><div class="taskinfo"><strong>Concepts and Relationships</strong><small>Connect related ideas</small></div><span class="status" id="s1">Available</span><button class="btn primary" id="b1">Open</button></div>
+      <div class="taskrow"><div class="num">02</div><div class="taskinfo"><strong>General Knowledge</strong><small>Short response assessment</small></div><span class="status" id="s2">Locked</span><button class="btn" id="b2" disabled>Open</button></div>
+      <div class="taskrow"><div class="num">03</div><div class="taskinfo"><strong>Knowledge Check</strong><small>Required response</small></div><span class="status" id="s3">Locked</span><button class="btn" id="b3" disabled>Open</button></div>
+    </section><p class="sub">Your progress is saved automatically for this session.</p>
+  </section>
+
+  <section class="view" id="task1">
+    <div class="task-nav"><button class="back-dashboard">← Dashboard</button><span class="plain-label">ACTIVITY 01 / 03</span></div>
+    <div class="activity"><div class="activity-head"><div><div class="eyebrow">LEARNING FOUNDATIONS · ACTIVITY 01</div><h2>Concepts and Relationships</h2><p>Drag one concept onto another to identify a meaningful relationship. Create two connections to submit your work.</p></div><span class="tag">CONCEPT MAP</span></div>
+      <div class="board" id="conceptBoard" aria-label="Concept tiles">
+        <div class="tile" draggable="true" data-concept="Questions">Questions</div><div class="tile" draggable="true" data-concept="Discovery">Discovery</div><div class="tile" draggable="true" data-concept="Practice">Practice</div><div class="tile" draggable="true" data-concept="Memory">Memory</div><div class="tile" draggable="true" data-concept="Curiosity">Curiosity</div>
+      </div><div class="linkzone" id="links"></div><div class="hint" id="mapHint">Select and drag concepts. You can remove a connection and try again.</div>
+      <div class="quiz-actions"><button class="btn primary" id="submitMap">Submit activity</button><span class="feedback" id="mapFeedback"></span></div>
+    </div>
+  </section>
+
+  <section class="view" id="task2">
+    <div class="task-nav"><button class="back-dashboard">← Dashboard</button><span class="plain-label">ACTIVITY 02 / 03</span></div>
+    <div class="activity"><div class="activity-head"><div><div class="eyebrow">LEARNING FOUNDATIONS · ACTIVITY 02</div><h2>General Knowledge</h2><p>Answer both questions to complete this short assessment.</p></div><span class="tag">KNOWLEDGE CHECK</span></div>
+      <div id="q2a"><div class="plain-label">QUESTION 1 OF 2</div><div class="question">Which planet is known as the Red Planet?</div><div class="choices" data-question="q1"><button class="choice" data-correct="false">Venus</button><button class="choice" data-correct="true">Mars</button><button class="choice" data-correct="false">Jupiter</button></div></div>
+      <div id="q2b" style="display:none"><div class="plain-label">QUESTION 2 OF 2</div><div class="question">What is the process by which plants use sunlight to make food?</div><div class="choices" data-question="q2"><button class="choice" data-correct="false">Respiration</button><button class="choice" data-correct="false">Evaporation</button><button class="choice" data-correct="true">Photosynthesis</button></div></div>
+      <div class="feedback" id="generalFeedback">Choose the best answer.</div><div class="quiz-actions"><button class="btn primary" id="submitGeneral" disabled>Submit answer</button></div>
+    </div>
+  </section>
+
+  <section class="view" id="task3">
+    <div class="task-nav"><button class="back-dashboard">← Dashboard</button><span class="plain-label">ACTIVITY 03 / 03</span></div>
+    <aside class="sidegrade"><small>CURRENT GRADE</small><div class="grade" id="grade">100%</div><div class="grade-note" id="gradeNote">Assessment in progress</div></aside>
+    <div class="activity final-layout"><div class="activity-head"><div><div class="eyebrow">LEARNING FOUNDATIONS · ACTIVITY 03</div><h2>Knowledge Check</h2><p>Read each question and submit your response.</p></div><span class="tag">FINAL ASSESSMENT</span></div>
+      <div class="plain-label" id="finalCounter">QUESTION 1</div><div class="final-question" id="finalQuestion">Why do people ask questions?</div>
+      <button class="answerbtn" id="answerButton">SUBMIT RESPONSE</button><div class="result" id="finalResult" aria-live="polite">Your response will be evaluated immediately.</div>
+      <div class="finalend" id="finalEnd"><h2>Activity submitted.</h2><p>The grade is recorded. The questions are finished.</p><p>Somewhere along the way, learning became something to complete. Maybe the curiosity was still there — waiting for something that made you want to follow it again.</p><p><em>What if you haven't lost your curiosity? What if you just haven't found what it's for yet?</em></p><a class="btn primary final-end-link" href="passion.html">Continue</a></div>
+    </div>
+  </section>
+</main>
+<div class="footer">WHITEBOARD LMS · PLEASE COMPLETE ALL REQUIRED ACTIVITIES</div><div class="whisper" id="whisper"></div><div class="memory" id="memory" aria-hidden="true"><img id="memoryImg" alt=""></div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+let completed=[false,false,false], active='dashboard', connections=[], dragged=null, selectedAnswer=null, q2step=1, attempts=0, grade=100, whisperIndex=0, whisperTimer=null;
+const whisperMessages=[
+  'You used to ask questions like these.',
+  'Do you remember when knowing the answer was less interesting than finding it?',
+  'You once followed a question just to see where it led.',
+  'When did learning become something to finish?',
+  'Maybe nothing changed about learning.',
+  'Maybe you just stopped looking for the part that felt like yours.',
+  'You are still allowed to wonder.',
+  'There is more to learn than what fits in a grade.'
+];
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(id).classList.add('active');active=id;window.scrollTo(0,0);if(id!=='task3'){hideWhisper();hideMemory();}}
+function renderDashboard(){ $('progressText').textContent=completed.filter(Boolean).length+' of 3 activities completed';$('fill').style.width=(completed.filter(Boolean).length/3*100)+'%';for(let i=0;i<3;i++){let unlocked=i===0||completed[i-1];$('s'+(i+1)).textContent=completed[i]?'Completed':unlocked?'Available':'Locked';$('b'+(i+1)).disabled=!unlocked;$('b'+(i+1)).textContent=completed[i]?'Review':'Open';$('b'+(i+1)).className='btn'+(unlocked?' primary':'');}}
+function complete(i){completed[i]=true;renderDashboard();}
+$('b1').onclick=()=>showView('task1');$('b2').onclick=()=>showView('task2');$('b3').onclick=()=>{showView('task3');if(attempts===0)startWhispers();};
+document.querySelectorAll('.back-dashboard').forEach(b=>b.onclick=()=>{hideWhisper();showView('dashboard');renderDashboard();});
+function drawLinks(){const zone=$('links');zone.innerHTML='';connections.forEach((c,i)=>{const el=document.createElement('div');el.className='linkitem';el.innerHTML='<span>'+c[0]+'</span><span>↔</span><span>'+c[1]+'</span>';const x=document.createElement('button');x.textContent='×';x.setAttribute('aria-label','Remove connection');x.onclick=()=>{connections.splice(i,1);drawLinks();};el.appendChild(x);zone.appendChild(el);});}
+document.querySelectorAll('.tile').forEach(tile=>{
+tile.addEventListener('dragstart',e=>{dragged=tile.dataset.concept;e.dataTransfer.setData('text/plain',dragged);});
+tile.addEventListener('dragover',e=>e.preventDefault());
+tile.addEventListener('drop',e=>{e.preventDefault();const from=e.dataTransfer.getData('text/plain')||dragged,to=tile.dataset.concept;if(from&&to&&from!==to&&!connections.some(c=>(c[0]===from&&c[1]===to)||(c[0]===to&&c[1]===from))){connections.push([from,to]);drawLinks();$('mapFeedback').textContent='';}});
+tile.addEventListener('click',()=>{if(!dragged){dragged=tile.dataset.concept;tile.classList.add('selected');$('mapHint').textContent='Now click a second concept to connect it.';}else{const to=tile.dataset.concept;if(dragged!==to&&!connections.some(c=>(c[0]===dragged&&c[1]===to)||(c[0]===to&&c[1]===dragged))){connections.push([dragged,to]);drawLinks();$('mapFeedback').textContent='';}document.querySelectorAll('.tile').forEach(t=>t.classList.remove('selected'));dragged=null;$('mapHint').textContent='Select and drag concepts. You can remove a connection and try again.';}});
+});
+$('submitMap').onclick=()=>{if(connections.length<2){$('mapFeedback').textContent='Please create two connections before submitting.';return;}const valid=connections.some(c=>c.includes('Questions')&&c.includes('Discovery'))&&connections.some(c=>c.includes('Curiosity')&&(c.includes('Questions')||c.includes('Discovery')));if(valid){$('mapFeedback').textContent='Activity completed.';complete(0);setTimeout(()=>showView('dashboard'),550);}else{$('mapFeedback').textContent='Some relationships may need another look. Think about what leads to discovery.';}};
+document.querySelectorAll('.choices').forEach(group=>group.querySelectorAll('.choice').forEach(btn=>btn.onclick=()=>{group.querySelectorAll('.choice').forEach(b=>b.classList.remove('chosen'));btn.classList.add('chosen');selectedAnswer=btn;$('submitGeneral').disabled=false;}));
+$('submitGeneral').onclick=()=>{if(!selectedAnswer)return;if(selectedAnswer.dataset.correct!=='true'){$('generalFeedback').textContent='Not quite. Try another answer.';selectedAnswer.classList.remove('chosen');selectedAnswer=null;$('submitGeneral').disabled=true;return;}if(q2step===1){$('q2a').style.display='none';$('q2b').style.display='block';$('generalFeedback').textContent='Correct. Next question.';$('submitGeneral').textContent='Submit answer';selectedAnswer=null;$('submitGeneral').disabled=true;q2step=2;}else{$('generalFeedback').textContent='Both answers recorded. Activity completed.';complete(1);setTimeout(()=>showView('dashboard'),650);}};
+const finalQuestions=['Why do people ask questions?','What can curiosity lead to?','When is learning meaningful?','What makes a question worth following?','What should you do when you do not understand something?','What is the value of discovering something new?','Why learn beyond what is required?','What are you curious about?'];
+function startWhispers(){whisperIndex=0;whisperTimer=setTimeout(nextWhisper,4500);}
+function nextWhisper(){if(active!=='task3'||attempts>=7)return;const w=$('whisper');w.textContent=whisperMessages[whisperIndex%whisperMessages.length];w.classList.remove('hide');w.classList.add('show');setTimeout(()=>{w.classList.remove('show');w.classList.add('hide');},3600);whisperIndex++;if(whisperIndex%3===2)memoryMoment();whisperTimer=setTimeout(nextWhisper,6200);}
+function hideWhisper(){clearTimeout(whisperTimer);$('whisper').classList.remove('show');$('whisper').classList.add('hide');}
+
+// ===== MEMORY FRAGMENTS =====
+// Optional photos shown as slow fades during the final assessment. Missing files are simply ignored.
+// To add photos: save them as Assets/<kind>_NN.jpg (NN = 01..08) next to this file. No code changes needed.
+const MEMORY_DIR='Assets/', MEMORY_EXT=['jpg'];                       // add 'png' / 'jpeg' here if needed
+const MEMORY_KINDS={childhood:{prefix:'childhood_',max:8},schoolwork:{prefix:'schoolwork_',max:8},diploma:{prefix:'diploma_',max:8}};
+// Which kinds appear in each phase. early = grades still green (attempts 0-2). late = grades falling (attempts 3-6).
+const MEMORY_STAGES={early:{kinds:['childhood'],tone:'warm'},late:{kinds:['schoolwork','diploma'],tone:'cool'}};
+const memoryAvail={childhood:[],schoolwork:[],diploma:[]}, memoryUsed=new Set();
+let memoryBusy=false, memoryTimers=[], memorySide=0;
+function probeMemories(){Object.keys(MEMORY_KINDS).forEach(kind=>{const k=MEMORY_KINDS[kind];for(let n=1;n<=k.max;n++)MEMORY_EXT.forEach(ext=>{const src=MEMORY_DIR+k.prefix+String(n).padStart(2,'0')+'.'+ext,im=new Image();im.onload=()=>{if(!memoryAvail[kind].includes(src)){memoryAvail[kind].push(src);memoryAvail[kind].sort();}};im.onerror=()=>{};im.src=src;});});}
+// The highest-numbered childhood photo is held back for the ending, so the last image is one the visitor has not seen yet.
+function reservedMemory(){const c=memoryAvail.childhood;return c.length?c[c.length-1]:null;}
+// Each phase only draws from its own kinds, in file order; if that pool is empty, nothing appears (the emotional order matters more than the count).
+function pickMemory(kinds){const res=reservedMemory();let pool=[];kinds.forEach(k=>memoryAvail[k].forEach(s=>{if(s!==res&&!memoryUsed.has(s))pool.push(s);}));
+  if(!pool.length)return null;memoryUsed.add(pool[0]);return pool[0];}
+function showMemory(src,tone,hold){const el=$('memory');memoryBusy=true;el.className='memory '+(memorySide++%2?'right':'left')+' '+tone;$('memoryImg').src=src;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  memoryTimers.push(setTimeout(()=>el.classList.add('clear'),hold*0.6));
+  memoryTimers.push(setTimeout(()=>el.classList.remove('show','clear'),hold));
+  memoryTimers.push(setTimeout(()=>{memoryBusy=false;},hold+3400+2500));}  // fade-out + a short rest before the next one
+function hideMemory(){memoryTimers.forEach(clearTimeout);const el=$('memory');el.classList.remove('show','clear');memoryTimers=[setTimeout(()=>{memoryBusy=false;},3400)];}
+// A fragment never stacks on another one and never appears outside the assessment.
+// If another fragment is still on screen, wait for it to finish instead of dropping this moment.
+function memoryMoment(delay,tries){delay=delay||3000;tries=tries||0;memoryTimers.push(setTimeout(()=>{if(active!=='task3'||attempts>=7)return;if(memoryBusy){if(tries<12)memoryMoment(1500,tries+1);return;}const cfg=MEMORY_STAGES[attempts<3?'early':'late'],src=pickMemory(cfg.kinds);if(src)showMemory(src,cfg.tone,9000);},delay));}
+function memoryAfterSubmit(){if(attempts>=7){finalMemory();return;}if(attempts===1||attempts===3||attempts===5)memoryMoment();}
+function finalMemory(){hideMemory();memoryTimers.push(setTimeout(()=>{if(active!=='task3')return;const src=reservedMemory()||pickMemory(MEMORY_STAGES.late.kinds);if(src){memoryUsed.add(src);showMemory(src,'cool',14000);}},4500));}
+$('answerButton').onclick=()=>{
+ if(attempts>=7)return;
+ attempts++;
+ const isGood=attempts<=2 || (attempts===3); // The same submission button becomes less predictable over time.
+ const button=$('answerButton');button.classList.remove('good','bad');button.classList.add(isGood?'good':'bad');
+ grade=Math.max(15,100-attempts*12);$('grade').textContent=grade+'%';$('gradeNote').textContent=attempts<3?'Assessment in progress':attempts<6?'Review required':'Final attempts';document.body.classList.toggle('redmode',attempts>=3);
+ $('finalCounter').textContent='QUESTION '+Math.min(attempts+1,finalQuestions.length);
+ $('finalQuestion').textContent=finalQuestions[Math.min(attempts,finalQuestions.length-1)];
+ const messages=['Correct.','Correct.','Correct.','Incorrect. Please try again.','Incorrect. Your response did not match the expected answer.','Incorrect. Review the material and try again.','Incorrect. Assessment nearing completion.'];
+ $('finalResult').textContent=messages[attempts-1];
+ memoryAfterSubmit();
+ if(attempts>=3){$('finalResult').style.color='#a34b50';}
+ if(attempts>=7){button.textContent='RESPONSE RECORDED';button.disabled=true;$('gradeNote').textContent='Grade finalized';$('finalResult').textContent='Submission complete.';$('finalEnd').classList.add('show');complete(2);hideWhisper();}
+ else {button.textContent=attempts<3?'SUBMIT RESPONSE':'TRY AGAIN';if(attempts>=3&&attempts%2===0){$('finalQuestion').textContent=finalQuestions[Math.min(attempts,finalQuestions.length-1)];}}
+};
+probeMemories();
+renderDashboard();
+})();
+</script></body></html>

@@ -1,0 +1,702 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#030308">
+<title>The Learning Loop</title>
+
+<style>
+  :root {
+    --bg: #030308;
+    --text: #e9e5f4;
+    --muted: #817d96;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+  }
+
+  body { user-select: none; }
+
+  #universe {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    cursor: default;
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at center,
+        transparent 20%, rgba(3,3,8,.28) 65%, #030308 110%);
+  }
+
+  /* Intro title */
+
+  #intro {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 1.6s ease, transform 1.6s ease;
+  }
+
+  #intro h1 {
+    margin: 0;
+    padding-left: .22em;
+    font-size: clamp(15px, 2vw, 23px);
+    font-weight: 300;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: rgba(235, 229, 255, .84);
+    text-shadow: 0 0 24px rgba(155, 130, 255, .23);
+    animation: titleBreath 7s ease-in-out infinite;
+  }
+
+  #intro p {
+    margin-top: 16px;
+    font-size: 9px;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    color: rgba(185, 177, 215, .42);
+    animation: titleBreath 7s ease-in-out infinite reverse;
+  }
+
+  #intro.hidden {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+
+  @keyframes titleBreath {
+    0%, 100% { opacity: .55; }
+    50% { opacity: 1; }
+  }
+
+  /* Minimal node selection label */
+
+  #hint {
+    position: fixed;
+    z-index: 3;
+    left: 50%;
+    bottom: 8%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: rgba(208, 200, 231, .4);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 1s ease;
+    pointer-events: none;
+  }
+
+  #hint.visible { opacity: 1; }
+
+
+  @media (prefers-reduced-motion: reduce) {
+    #intro h1, #intro p { animation: none; }
+    *, *::before, *::after { scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+
+<body>
+<canvas id="universe" aria-label="Interactive map of a learning journey"></canvas>
+<div class="vignette"></div>
+
+<div id="intro">
+  <h1>The Learning Loop</h1>
+  <p>Touch to enter</p>
+</div>
+
+<div id="hint">Choose a sphere · Drag to explore</div>
+
+<section id="story" aria-live="polite">
+  <div class="eyebrow" id="storyNumber"></div>
+  <h2 id="storyTitle"></h2>
+  <p id="storyText"></p>
+  <button id="backButton">Return to the loop</button>
+</section>
+
+<script>
+(() => {
+  const canvas = document.getElementById("universe");
+  const ctx = canvas.getContext("2d");
+
+  const intro = document.getElementById("intro");
+  const hint = document.getElementById("hint");
+  const story = document.getElementById("story");
+  const storyNumber = document.getElementById("storyNumber");
+  const storyTitle = document.getElementById("storyTitle");
+  const storyText = document.getElementById("storyText");
+
+  const TAU = Math.PI * 2;
+
+  // Replace these sample stories with your own memories.
+  const nodes = [
+  {
+    title: "Observation",
+    page: "observation.html",
+    color: [107, 166, 255]
+  },
+  {
+    title: "Curiosity",
+    page: "curiosity.html",
+    color: [173, 116, 255]
+  },
+  {
+    title: "School",
+    page: "school.html",
+    color: [238, 164, 104]
+  },
+  {
+    title: "Passion",
+    page: "passion.html",
+    color: [99, 218, 185]
+  },
+  {
+    title: "Questions",
+    page: "questions.html",
+    color: [255, 126, 173]
+  },
+  {
+    title: "The Present",
+    page: "present.html",
+    color: [128, 151, 255]
+  },
+  {
+    title: "Beyond",
+    page: "beyond.html",
+    color: [202, 199, 224]
+  }
+];
+  let W = 0, H = 0, DPR = 1;
+  let started = false;
+  let transition = 0;
+  let rotation = -Math.PI / 2;
+  let targetRotation = rotation;
+  let dragging = false;
+  let moved = false;
+  let lastX = 0;
+  let lastY = 0;
+  let pointerDown = false;
+  let selected = -1;
+  let hovered = -1;
+  let lastTime = 0;
+  let elapsed = 0;
+  let orbitRadius = 0;
+  let coreRadius = 0;
+  let reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const stars = [];
+  const ambient = [];
+
+  let introTime = 0;
+
+const INTRO_ORB_DURATION = 3.2;
+const INTRO_FADE_IN = 1.0;
+const INTRO_FADE_OUT = 1.0;
+
+function getIntroOrb() {
+  // Fase 0: centro. Fases 1–7: los siete nodos.
+  const phase = Math.floor(introTime / INTRO_ORB_DURATION) % 8;
+  const localTime = introTime % INTRO_ORB_DURATION;
+
+  const fadeIn = Math.min(1, localTime / INTRO_FADE_IN);
+  const fadeOut = Math.min(
+    1,
+    (INTRO_ORB_DURATION - localTime) / INTRO_FADE_OUT
+  );
+
+  const smoothIn = fadeIn * fadeIn * (3 - 2 * fadeIn);
+  const smoothOut = fadeOut * fadeOut * (3 - 2 * fadeOut);
+
+  return {
+    index: phase === 0 ? -1 : phase - 1,
+    alpha: Math.min(smoothIn, smoothOut)
+  };
+}
+
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    orbitRadius = Math.min(W * .29, H * .30, 235);
+    coreRadius = Math.min(43, Math.max(29, orbitRadius * .19));
+
+    makeStars();
+  }
+
+  function makeStars() {
+    stars.length = 0;
+    ambient.length = 0;
+
+    const count = Math.min(240, Math.floor(W * H / 5200));
+
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.1 + .15,
+        phase: Math.random() * TAU,
+        speed: .2 + Math.random() * .8
+      });
+    }
+
+    // Seven colored presences drifting in the darkness.
+    for (let i = 0; i < 7; i++) {
+      ambient.push({
+        x: .1 + Math.random() * .8,
+        y: .1 + Math.random() * .8,
+        size: 35 + Math.random() * 70,
+        phase: Math.random() * TAU,
+        speed: .12 + Math.random() * .15,
+        color: nodes[i].color,
+        drift: 12 + Math.random() * 24
+      });
+    }
+  }
+
+  function center() {
+    return { x: W / 2, y: H / 2 };
+  }
+
+ function nodePosition(i, t = 1) {
+  const c = center();
+
+  // Posiciones objetivo distribuidas uniformemente.
+  const angle =
+    rotation +
+    (i * TAU / 7) +
+    elapsed * 0.055;
+
+  return {
+    x: c.x + Math.cos(angle) * orbitRadius * t,
+    y: c.y + Math.sin(angle) * orbitRadius * 0.82 * t,
+    angle
+  };
+}
+
+  function rgba(color, alpha) {
+    return `rgba(${color[0]},${color[1]},${color[2]},${alpha})`;
+  }
+
+  function glow(x, y, radius, color, strength = 1) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    g.addColorStop(0, rgba(color, .22 * strength));
+    g.addColorStop(.35, rgba(color, .09 * strength));
+    g.addColorStop(1, rgba(color, 0));
+
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, TAU);
+    ctx.fill();
+  }
+
+  function drawStarfield(dt) {
+    for (const s of stars) {
+      const flicker = .15 + .6 * ((Math.sin(elapsed * s.speed + s.phase) + 1) / 2);
+      ctx.fillStyle = `rgba(211,205,242,${flicker * .6})`;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, TAU);
+      ctx.fill();
+    }
+
+    for (const a of ambient) {
+      const pulse = .5 + .5 * Math.sin(elapsed * a.speed + a.phase);
+      const x = a.x * W + Math.sin(elapsed * .09 + a.phase) * a.drift;
+      const y = a.y * H + Math.cos(elapsed * .12 + a.phase) * a.drift;
+
+      glow(x, y, a.size * (1 + pulse * .25), a.color, .8);
+
+      // Soft, imperfectly defined luminous rim.
+      ctx.beginPath();
+      ctx.arc(x, y, a.size * (.22 + pulse * .06), 0, TAU);
+      ctx.strokeStyle = rgba(a.color, .025 + pulse * .045);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  function drawOrbit() {
+    const c = center();
+
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.scale(1, .82);
+
+    // Faint orbital guide.
+    ctx.beginPath();
+    ctx.ellipse(0, 0, orbitRadius, orbitRadius, 0, 0, TAU);
+    ctx.strokeStyle = `rgba(161,145,206,${.025 + transition * .15})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // A second, more subtle inner trace.
+    ctx.beginPath();
+    ctx.ellipse(0, 0, orbitRadius * .96, orbitRadius * .96, 0, 0, TAU);
+    ctx.strokeStyle = `rgba(126,116,169,${transition * .035})`;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawCore(x, y, t) {
+    const r = coreRadius;
+    const pulse = 1 + Math.sin(elapsed * .65) * .025;
+    const size = r * pulse;
+
+    glow(x, y, size * 3.6, [137, 111, 216], .8);
+
+    // Outer atmosphere.
+    const atmosphere = ctx.createRadialGradient(x, y, size * .65, x, y, size * 1.5);
+    atmosphere.addColorStop(0, "rgba(7,7,15,0)");
+    atmosphere.addColorStop(.72, "rgba(116,96,179,.08)");
+    atmosphere.addColorStop(.88, "rgba(174,159,232,.38)");
+    atmosphere.addColorStop(1, "rgba(87,75,139,0)");
+
+    ctx.fillStyle = atmosphere;
+    ctx.beginPath();
+    ctx.arc(x, y, size * 1.5, 0, TAU);
+    ctx.fill();
+
+    // A dark center with no dominant color.
+    const core = ctx.createRadialGradient(
+      x - size * .25, y - size * .3, size * .05,
+      x, y, size
+    );
+    core.addColorStop(0, "#171522");
+    core.addColorStop(.65, "#090910");
+    core.addColorStop(1, "#040409");
+
+    ctx.fillStyle = core;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, TAU);
+    ctx.fill();
+
+    // Broken, multicolored cosmic rim.
+    const rimColors = [
+      [108, 171, 255], [173, 116, 255],
+      [99, 218, 185], [238, 164, 104],
+      [255, 126, 173], [128, 151, 255],
+      [202, 199, 224]
+    ];
+
+    for (let i = 0; i < rimColors.length; i++) {
+      const start = i * TAU / 7 + elapsed * .018;
+      ctx.beginPath();
+      ctx.arc(x, y, size * 1.02, start, start + TAU / 10);
+      ctx.strokeStyle = rgba(rimColors[i], .28 + .22 * Math.sin(elapsed + i));
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.arc(x, y, size * .86, 0, TAU);
+    ctx.strokeStyle = "rgba(201,190,238,.11)";
+    ctx.lineWidth = .7;
+    ctx.stroke();
+
+    // The title belongs to the core once the system forms.
+    if (transition > .65 && selected < 0) {
+      const alpha = Math.min(1, (transition - .65) / .35);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(233,229,244,.76)";
+      ctx.font = `300 ${Math.max(7, Math.min(10, size * .22))}px "Segoe UI", Arial`;
+      ctx.letterSpacing = "1.2px";
+      ctx.fillText("THE LEARNING", x, y - 4);
+      ctx.fillText("LOOP", x, y + 7);
+      ctx.restore();
+    }
+  }
+
+  function drawNode(i, pos, t) {
+    const c = nodes[i].color;
+    const pulse = 1 + Math.sin(elapsed * .8 + i * 1.7) * .055;
+    const r = (selected === i ? 18 : hovered === i ? 15 : 11) * pulse;
+    const x = pos.x;
+    const y = pos.y;
+
+    glow(x, y, r * 5.5, c, .9);
+
+    // Orbital body.
+    const body = ctx.createRadialGradient(
+      x - r * .3, y - r * .35, 0,
+      x, y, r * 1.45
+    );
+    body.addColorStop(0, rgba(c, .9));
+    body.addColorStop(.22, rgba(c, .55));
+    body.addColorStop(.55, rgba(c, .2));
+    body.addColorStop(1, rgba(c, 0));
+
+    ctx.fillStyle = body;
+    ctx.beginPath();
+    ctx.arc(x, y, r * 1.45, 0, TAU);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(x, y, r * .56, 0, TAU);
+    ctx.fillStyle = rgba(c, .22);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(x, y, r * .78, 0, TAU);
+    ctx.strokeStyle = rgba(c, hovered === i || selected === i ? .9 : .36);
+    ctx.lineWidth = hovered === i || selected === i ? 1.25 : .7;
+    ctx.stroke();
+
+    // Labels only appear after the system is revealed.
+    if (transition > .8) {
+      const labelAlpha = Math.min(1, (transition - .8) / .2);
+      const labelOffset = orbitRadius > 160 ? 24 : 20;
+
+      ctx.save();
+      ctx.globalAlpha = labelAlpha * (selected === -1 ? 1 : selected === i ? 1 : .2);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.font = `${hovered === i ? "400" : "300"} 10px "Segoe UI", Arial`;
+      ctx.fillStyle = hovered === i || selected === i
+        ? rgba(c, 1)
+        : "rgba(210,204,230,.65)";
+      ctx.fillText(nodes[i].title, x, y + labelOffset);
+      ctx.restore();
+    }
+  }
+
+  function drawSelectedFocus() {
+    if (selected < 0) return;
+
+    const c = center();
+    const pos = nodePosition(selected, .35);
+
+    glow(pos.x, pos.y, 130, nodes[selected].color, .6);
+
+    ctx.beginPath();
+    ctx.moveTo(c.x, c.y);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.strokeStyle = rgba(nodes[selected].color, .14);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  function frame(now) {
+    const dt = Math.min((now - (lastTime || now)) / 1000, .04);
+    lastTime = now;
+
+    if (!reduceMotion) elapsed += dt;
+
+    const ease = reduceMotion ? 1 : 1 - Math.pow(.001, dt);
+    rotation += (targetRotation - rotation) * Math.min(1, ease);
+
+    if (started && transition < 1) {
+      transition = Math.min(1, transition + dt / (reduceMotion ? .01 : 2.2));
+    }
+
+    ctx.clearRect(0, 0, W, H);
+    drawStarfield(dt);
+
+    if (!started) {
+  if (!reduceMotion) introTime += dt;
+
+  const c = center();
+  const orb = getIntroOrb();
+
+  if (orb.index === -1) {
+    // La esfera central aparece primero.
+    glow(c.x, c.y, 130, [137, 111, 216], orb.alpha);
+    drawCore(c.x, c.y, orb.alpha);
+  } else {
+    // Después, cada nodo aparece en su futura posición orbital.
+    const p = nodePosition(orb.index, 1);
+
+    ctx.save();
+    ctx.globalAlpha = orb.alpha;
+    drawNode(orb.index, p, 1);
+    ctx.restore();
+  }
+
+  requestAnimationFrame(frame);
+  return;
+}
+
+    if (transition > 0) {
+      drawOrbit();
+
+      const c = center();
+      const formation = transition * transition * (3 - 2 * transition);
+
+for (let i = 0; i < nodes.length; i++) {
+  const target = nodePosition(i, 1);
+
+  // Todas las esferas convergen desde el centro y se
+  // distribuyen siguiendo sus posiciones orbitales.
+  const startAngle = rotation + i * TAU / 7 - 1.1;
+  const startRadius = orbitRadius * 0.12;
+
+  const startX = c.x + Math.cos(startAngle) * startRadius;
+  const startY = c.y + Math.sin(startAngle) * startRadius * 0.82;
+
+  const x = startX + (target.x - startX) * formation;
+  const y = startY + (target.y - startY) * formation;
+
+  drawNode(i, { x, y }, formation);
+}
+
+drawCore(c.x, c.y, formation);
+drawSelectedFocus();
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function start() {
+    if (started) return;
+    started = true;
+
+    intro.classList.add("hidden");
+    hint.classList.add("visible");
+
+    // Bring the ambient orbs into their orbital positions.
+    transition = 0;
+
+    setTimeout(() => {
+      intro.style.display = "none";
+    }, 1700);
+  }
+
+  function openNodePage(i) {
+  if (!started || transition < 0.95 || i < 0) return;
+
+  window.location.href = nodes[i].page;
+}
+
+  function getPointerPos(event) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
+
+  function hitTest(x, y) {
+    // Use target positions so hit-testing remains stable during rotation.
+    for (let i = 0; i < nodes.length; i++) {
+      const p = nodePosition(i, 1);
+      const dx = x - p.x;
+      const dy = (y - p.y) / .82;
+      if (Math.hypot(dx, dy) < 27) return i;
+    }
+    return -1;
+  }
+
+  canvas.addEventListener("pointerdown", event => {
+    if (!started) {
+      start();
+      return;
+    }
+
+    if (selected >= 0) return;
+
+    const p = getPointerPos(event);
+    pointerDown = true;
+    dragging = false;
+    moved = false;
+    lastX = p.x;
+    lastY = p.y;
+
+    canvas.setPointerCapture(event.pointerId);
+  });
+
+  canvas.addEventListener("pointermove", event => {
+    const p = getPointerPos(event);
+
+    if (pointerDown) {
+      const dx = p.x - lastX;
+      const dy = p.y - lastY;
+
+      if (Math.hypot(p.x - lastX, p.y - lastY) > 2) {
+        dragging = true;
+        moved = true;
+      }
+
+      if (dragging && !reduceMotion) {
+        targetRotation += dx * .006;
+      }
+
+      lastX = p.x;
+      lastY = p.y;
+      return;
+    }
+
+    hovered = started && transition >= .95
+      ? hitTest(p.x, p.y)
+      : -1;
+
+    canvas.style.cursor = hovered >= 0 ? "pointer" : "default";
+  });
+
+  canvas.addEventListener("pointerup", event => {
+    if (!pointerDown) return;
+
+    const p = getPointerPos(event);
+    pointerDown = false;
+
+    if (!moved) {
+      const i = hitTest(p.x, p.y);
+      if (i >= 0) openNodePage(i);
+      else if (!started) start();
+    }
+
+    dragging = false;
+  });
+
+  canvas.addEventListener("pointercancel", () => {
+    pointerDown = false;
+    dragging = false;
+  });
+
+  // Allow tapping/clicking the background to begin.
+  intro.addEventListener("click", start);
+
+  // Also support keyboard navigation.
+  window.addEventListener("keydown", event => {
+  if (event.key === "Enter" && !started) start();
+});
+
+  window.addEventListener("resize", resize);
+
+  resize();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

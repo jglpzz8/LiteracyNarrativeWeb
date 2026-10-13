@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050505">
+<title>Observation — The Learning Loop</title>
+<style>
+:root{color-scheme:dark;--bg:#050505;--white:#ededed;--soft:#aaa;--dim:#666;--line:#333;--panel:#0c0c0c}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--white);font-family:Consolas,"Courier New",monospace}button,a{font:inherit}canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:manipulation}
+#top{position:fixed;z-index:2;top:25px;left:27px;pointer-events:none;text-shadow:0 0 12px #fff2}#top small{display:block;font-size:10px;letter-spacing:.18em;color:#777}#top h1{margin:8px 0 0;font-size:17px;font-weight:400;letter-spacing:.13em}
+#counter{position:fixed;right:27px;top:28px;z-index:2;font-size:10px;letter-spacing:.12em;color:#777}
+#message{position:fixed;z-index:3;left:50%;bottom:9%;transform:translate(-50%,10px);width:min(430px,calc(100% - 34px));padding:17px 20px;background:rgba(8,8,8,.92);border:1px solid #383838;box-shadow:0 0 32px #fff08;opacity:0;transition:opacity .65s,transform .65s;pointer-events:none;text-align:left}
+#message.visible{opacity:1;transform:translate(-50%,0)}#message .label{font-size:10px;color:#888;letter-spacing:.16em;text-transform:uppercase}#message p{font-family:"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.65;color:#ddd;margin:10px 0 0}
+#prompt{position:fixed;z-index:2;bottom:27px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.12em;color:#686868;pointer-events:none;transition:opacity .5s}
+.overlay{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:opacity .7s,visibility .7s}
+.overlay.visible{opacity:1;visibility:visible}.panel{width:min(440px,100%);padding:26px;background:#080808;border:1px solid #444;box-shadow:0 0 50px #fff0a}.eyebrow{font-size:10px;letter-spacing:.16em;color:#888;text-transform:uppercase}.panel h2{font-size:19px;font-weight:400;line-height:1.4;margin:13px 0}.panel p{font-family:"Segoe UI",Arial,sans-serif;color:#aaa;font-size:13px;line-height:1.65;margin:8px 0 18px}.choice{display:block;width:100%;padding:13px 14px;margin-top:9px;text-align:left;color:#ddd;background:#0d0d0d;border:1px solid #393939;cursor:pointer;font-size:12px;line-height:1.5;transition:background .2s,border-color .2s}.choice:hover,.choice:focus-visible{background:#191919;border-color:#aaa;outline:none}.choice:disabled{opacity:.45;cursor:default}
+#thinking{display:none;color:#888;font-size:10px;letter-spacing:.08em;margin-top:16px;line-height:1.8}#thinking.visible{display:block}#thinkBar{height:2px;background:#222;margin-top:8px;overflow:hidden}#thinkFill{height:100%;width:0;background:#bbb;transition:width .2s linear}
+#reveal{text-align:center}.bigline{font-size:clamp(22px,4vw,32px);line-height:1.35;letter-spacing:-.035em;color:#f1f1f1;margin:14px 0 18px;text-shadow:0 0 25px #fff2}.revealcopy{max-width:330px;margin:0 auto 18px!important;color:#c4c4c4!important}#reveal .lastline{font-size:11px;letter-spacing:.04em;color:#888;margin-bottom:24px!important}
+.action{display:inline-block;text-decoration:none;color:#eee;border:1px solid #666;padding:12px 16px;font-size:11px;letter-spacing:.04em;background:#101010;cursor:pointer}.action:hover{background:#202020;border-color:#bbb}#continue{display:none;position:fixed;z-index:4;right:24px;bottom:20px}#continue.visible{display:block}
+@media(max-height:560px){#top{top:13px;left:16px}#counter{top:16px;right:16px}#message{bottom:7%;padding:12px 14px}#prompt{display:none}.panel{padding:18px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<canvas id="world" aria-label="A field of light points. Touch them to observe how they behave."></canvas>
+<header id="top"><small>THE LEARNING LOOP / 01</small><h1>OBSERVATION</h1></header>
+<div id="counter">SIGNAL: <span id="signal">WAITING</span></div>
+<section id="message" aria-live="polite"><div class="label" id="messageLabel">FIRST CONTACT</div><p id="messageText">Something exists here. You do not know what it is yet.</p></section>
+<div id="prompt">LOOK AROUND · TOUCH A LIGHT · NOTICE WHAT CHANGES</div>
+
+<section id="hypothesis" class="overlay" aria-modal="true" role="dialog" aria-labelledby="question">
+  <div class="panel"><div class="eyebrow">PATTERN DETECTED?</div><h2 id="question">What do you think is happening?</h2><p>You have seen the lights change. Take a moment. Which explanation best fits what you observed? There is no timer.</p>
+    <button class="choice" data-answer="rhythm">Some lights follow the same rhythm.</button>
+    <button class="choice" data-answer="color">Lights of the same color behave alike.</button>
+    <button class="choice" data-answer="random">There is no pattern. It is all random.</button>
+    <div id="thinking">TAKE YOUR TIME. YOU CAN CHANGE YOUR MIND.<div id="thinkBar"><div id="thinkFill"></div></div></div>
+  </div>
+</section>
+
+<section id="revealOverlay" class="overlay" aria-modal="true" role="dialog" aria-labelledby="revealTitle">
+  <div class="panel" id="reveal"><div class="eyebrow">OBSERVATION COMPLETE</div><div class="bigline" id="revealTitle">You were learning before you knew it.</div><p class="revealcopy">Observation is not simply seeing. It is the beginning of making sense of what you see.</p><p class="lastline">Every question begins with something we notice.</p><a class="action" href="curiosity.html">Continue to Curiosity →</a></div>
+</section>
+<a id="continue" class="action" href="curiosity.html">Continue to Curiosity →</a>
+
+<script>
+(() => {
+  const canvas=document.getElementById('world'),ctx=canvas.getContext('2d');
+  const message=document.getElementById('message'),label=document.getElementById('messageLabel'),text=document.getElementById('messageText');
+  const hypothesis=document.getElementById('hypothesis'),revealOverlay=document.getElementById('revealOverlay');
+  const signal=document.getElementById('signal'),prompt=document.getElementById('prompt'),thinking=document.getElementById('thinking'),thinkFill=document.getElementById('thinkFill');
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,TAU=Math.PI*2;
+  let W=0,H=0,DPR=1,time=0,last=0,touches=0,locked=false,complete=false,firstTouchTime=null,messageTimeout=null,questionTimer=null,questionShownAt=0;
+  const gray=[230,230,230];
+  // Paired rhythms are the discoverable rule. Color is intentionally absent.
+  const dots=[
+    {x:.22,y:.31,rhythm:0,phase:0}, {x:.72,y:.27,rhythm:1,phase:1.1},
+    {x:.39,y:.67,rhythm:0,phase:0}, {x:.79,y:.66,rhythm:2,phase:2.0},
+    {x:.57,y:.43,rhythm:1,phase:1.1}, {x:.16,y:.75,rhythm:2,phase:2.0}
+  ];
+  const stars=Array.from({length:125},()=>({x:Math.random(),y:Math.random(),r:Math.random()*.9+.15,a:Math.random()*.3+.06}));
+  function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}
+  function rgba(a){return `rgba(235,235,235,${a})`}
+  function pos(d){return{x:d.x*W,y:d.y*H}}
+  function pulse(d){return .5+.5*Math.sin(time*(1+d.rhythm*.22)+d.phase)}
+  function showMessage(head,body,duration=4400){clearTimeout(messageTimeout);label.textContent=head;text.textContent=body;message.classList.add('visible');if(duration>0)messageTimeout=setTimeout(()=>message.classList.remove('visible'),duration)}
+  function background(){ctx.fillStyle='#050505';ctx.fillRect(0,0,W,H);for(const s of stars){ctx.fillStyle=rgba(s.a*(.65+.35*Math.sin(time*.25+s.x*8)));ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,TAU);ctx.fill()}const g=ctx.createRadialGradient(W*.5,H*.48,0,W*.5,H*.48,Math.max(W,H)*.6);g.addColorStop(0,'rgba(255,255,255,.035)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+  function drawConnections(){if(touches<2)return;for(let i=0;i<dots.length;i++)for(let j=i+1;j<dots.length;j++){const a=dots[i],b=dots[j];if(a.rhythm!==b.rhythm)continue;const pa=pos(a),pb=pos(b),difference=Math.abs(pulse(a)-pulse(b)),strength=Math.max(0,1-difference*3),reveal=Math.min(1,(touches-1)/3);ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.strokeStyle=rgba(.035+.17*strength*reveal);ctx.lineWidth=.8;ctx.stroke()}}
+  function drawDots(){dots.forEach(d=>{const p=pos(d),v=pulse(d),r=2.5+v*4.5;const halo=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,31+r*2);halo.addColorStop(0,rgba(.08+v*.12));halo.addColorStop(.45,rgba(.025+v*.035));halo.addColorStop(1,rgba(0));ctx.fillStyle=halo;ctx.beginPath();ctx.arc(p.x,p.y,31+r*2,0,TAU);ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,r,0,TAU);ctx.fillStyle=rgba(.45+v*.5);ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,r+5,0,TAU);ctx.strokeStyle=rgba(.12+v*.2);ctx.lineWidth=.8;ctx.stroke();if(d.flashUntil&&time<d.flashUntil){ctx.beginPath();ctx.arc(p.x,p.y,r+12,0,TAU);ctx.strokeStyle=rgba(.7);ctx.stroke()}})}
+  function frame(now){const dt=Math.min((now-(last||now))/1000,.04);last=now;if(!reduced)time+=dt;background();drawConnections();drawDots();requestAnimationFrame(frame)}
+  function beginQuestion(){if(locked||complete)return;locked=true;signal.textContent='AWAITING HYPOTHESIS';prompt.style.opacity='0';showMessage('A POSSIBLE PATTERN','You have noticed that some lights may change together. Is that a real relationship, or just a coincidence?',0);questionShownAt=performance.now();setTimeout(()=>{hypothesis.classList.add('visible');thinking.classList.add('visible');},1100)}
+  function observe(d){if(locked||complete)return;touches++;d.flashUntil=time+1.4;signal.textContent=touches<3?'OBSERVING':'PATTERN?';
+    if(touches===1)showMessage('FIRST CONTACT','You touched something, and it changed. You noticed a reaction.');
+    else if(touches===2)showMessage('COMPARISON','You are comparing one moment with another. A single event can be surprising; repeated events can become evidence.');
+    else if(touches===3)showMessage('RECOGNITION','Some lights seem to pulse together. Try watching two at once. Do they keep the same rhythm?');
+    else if(touches===4)showMessage('A QUESTION FORMS','You have started looking for a rule. Keep exploring until you feel ready to explain what you noticed.');
+    if(touches>=5){clearTimeout(questionTimer);questionTimer=setTimeout(beginQuestion,6500)}
+  }
+  canvas.addEventListener('pointerdown',e=>{if(locked||complete)return;const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,dist=Infinity;for(const d of dots){const p=pos(d),v=Math.hypot(x-p.x,y-p.y);if(v<dist){dist=v;best=d}}if(best&&dist<Math.max(28,Math.min(42,W*.055))){if(firstTouchTime===null)firstTouchTime=time;observe(best)}else if(touches===0)showMessage('LOOK AROUND','There is no instruction yet. Take a moment. Notice the lights before you touch them.',3600)});
+  // Give the visitor unhurried thinking time. The choices remain until one is selected.
+  document.querySelectorAll('.choice').forEach(button=>button.addEventListener('click',()=>{
+    if(!locked||complete)return;const answer=button.dataset.answer;hypothesis.classList.remove('visible');
+    if(answer==='rhythm'){
+      complete=true;signal.textContent='PATTERN RECOGNIZED';showMessage('HYPOTHESIS SUPPORTED','You observed, compared, formed an explanation, and tested what you thought you saw. You began using the logic of the scientific method without being told to.',0);setTimeout(()=>revealOverlay.classList.add('visible'),2600);
+    }else{
+      locked=false;signal.textContent='OBSERVE AGAIN';touches=Math.max(2,touches-1);prompt.style.opacity='1';
+      showMessage(answer==='color'?'A CLUE, NOT PROOF':'UNCERTAINTY REMAINS',answer==='color'?'Color is an understandable clue. But look again: do lights of the same color always behave alike?':'It can look random when we have not noticed the rule yet. Watch two lights over time and compare their rhythm.',0);
+      // Keep the question available after a fresh observation cycle; no penalty or countdown.
+      const reopen=()=>{if(locked||complete)return; if(touches>=4){locked=true;signal.textContent='AWAITING HYPOTHESIS';questionShownAt=performance.now();hypothesis.classList.add('visible');thinking.classList.add('visible')}};
+      const oldHandler=()=>{};
+      window.setTimeout(()=>{if(!complete)showMessage('TAKE YOUR TIME','Explore a few more lights. When you are ready, look for a relationship that stays consistent.',5000)},4300);
+      // A subsequent fifth observation opens the question again after a pause.
+      questionTimer=setTimeout(()=>{if(!complete&&!locked&&touches>=4)reopen()},9000);
+    }
+  }));
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&hypothesis.classList.contains('visible')){hypothesis.classList.remove('visible');locked=false;signal.textContent='OBSERVING';prompt.style.opacity='1'}});
+  window.addEventListener('resize',resize);resize();showMessage('FIRST CONTACT','Something exists here. You do not know what it is yet.',5200);requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

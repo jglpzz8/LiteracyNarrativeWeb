@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QUESTIONING.exe — The Learning Loop</title><style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#e8e6e1;color:#222;font:13px/1.5 Geneva,"Lucida Grande",Verdana,sans-serif}
+body{background:radial-gradient(#0002 1px,transparent 1.4px) 0 0/6px 6px,#e8e6e1}
+button,textarea{font:inherit;color:inherit}:focus-visible{outline:2px solid #222;outline-offset:2px}
+#bar{position:fixed;top:0;left:0;right:0;height:26px;border-bottom:1px solid #222;background:#f7f6f2;display:flex;align-items:center;justify-content:space-between;padding:0 10px;z-index:50}#bar b{letter-spacing:.08em}#bar i{display:inline-block;width:8px;height:8px;background:#ff3ea5;margin-right:8px}
+#mu{background:none;border:1px solid #222;padding:0 8px;cursor:pointer}
+#rec{position:fixed;inset:0;z-index:60;pointer-events:none;background:linear-gradient(135deg,#ff3ea5,#ffd23f 35%,#2de2e6 65%,#6a4cff);animation:rc 4s ease-out forwards}@keyframes rc{to{opacity:0;visibility:hidden}}
+#ic{position:fixed;top:40px;right:12px;display:flex;flex-direction:column;gap:8px;align-items:center;z-index:5}
+.i{background:none;border:0;cursor:pointer;width:112px;text-align:center;padding:4px;font-size:11px;word-break:break-all}.i[hidden]{display:none}.i.show{animation:fi 2s both}
+.ic{display:block;margin:0 auto 3px;width:26px;height:32px;border:1px solid #222;background:#f7f6f2;box-shadow:2px 2px 0 #222}.x .ic{background:#222}.ed .ic{background:repeating-linear-gradient(0deg,#222 0 1px,#f7f6f2 1px 5px)}
+.acc .ic{border-bottom:4px solid #ff3ea5}#i-exe{animation:pl 3s ease-in-out 4}@keyframes pl{50%{transform:translateY(-3px)}}
+.w{position:absolute;display:none;background:#f7f6f2;border:1px solid #222;box-shadow:3px 3px 0 #222;width:min(300px,96vw);z-index:10}.w.on{display:block;animation:fi .6s both}@keyframes fi{from{opacity:0}}
+.t{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222;padding:2px 4px;cursor:move;touch-action:none;background:repeating-linear-gradient(0deg,#222 0 1px,#f7f6f2 1px 4px)}.t span{background:#f7f6f2;padding:0 8px}.t button{background:#f7f6f2;border:1px solid #222;width:20px;height:18px;line-height:14px;cursor:pointer;padding:0}
+.b{padding:10px 12px}.b canvas{display:block;max-width:100%;background:#fff;border:1px solid #bbb;touch-action:none}.b p{margin:8px 0 0;min-height:1.6em;font-family:Georgia,serif;font-size:14px}
+.b button.k{background:#f7f6f2;border:1px solid #222;padding:2px 9px;margin:6px 6px 0 0;cursor:pointer}textarea{width:100%;height:64px;margin-top:8px;border:1px solid #999;background:#fff;padding:4px;resize:none}
+#st{position:relative;height:160px;border:1px solid #bbb;background:#fff}#st canvas{position:absolute;left:0;top:0;border:0;mix-blend-mode:multiply;transition:opacity 1.4s}
+.cur{display:inline-block;width:7px;height:14px;background:#222;vertical-align:-2px;animation:bl 1s steps(1) infinite}@keyframes bl{50%{opacity:0}}
+a.go{display:inline-block;margin-top:10px;color:#222}
+@media(max-width:700px){#ic{flex-direction:row;flex-wrap:wrap;justify-content:center;left:6px;right:6px;top:34px}.i{width:62px;font-size:9px}.w{left:2vw!important;width:96vw!important;top:176px!important;max-height:calc(100vh - 186px);overflow:auto}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="bar"><span><i></i><b>THE LEARNING LOOP</b></span><button id="mu" aria-label="Toggle sound">♪ ON</button></div><div id="rec"></div>
+<div id="ic"><button class="i x" id="i-exe" data-o="doc"><span class="ic"></span>QUESTIONING.exe</button>
+<button class="i later" data-o="blank" hidden><span class="ic"></span>THE BLANK PAGE</button><button class="i later" data-o="loop" hidden><span class="ic"></span>THE REVISION LOOP</button>
+<button class="i later" data-o="d0" hidden><span class="ic"></span>game_idea.txt</button><button class="i later" data-o="d1" hidden><span class="ic"></span>something_to_write.txt</button><button class="i later" data-o="d2" hidden><span class="ic"></span>project_i_keep_postponing.txt</button>
+<button class="i acc" id="i-next" data-o="next" hidden><span class="ic"></span>NEXT_STEP.txt</button></div>
+<div class="w" id="w-doc" data-t="QUESTIONING.exe"><div class="b" id="dt" style="min-height:120px"></div></div>
+<div class="w" id="w-blank" data-t="THE BLANK PAGE"><div class="b"><canvas id="bc" width="260" height="150"></canvas><button class="k" id="sh">+ shape</button><p id="bp"></p></div></div>
+<div class="w" id="w-loop" data-t="THE REVISION LOOP"><div class="b"><div id="st"></div><div id="vb"></div><button class="k" id="rv">revise</button><button class="k" id="lv">leave the loop</button><p id="lp"></p></div></div>
+<div class="w" id="w-d0" data-t="game_idea.txt"><div class="b"><p>A small world where the rooms rearrange themselves when you look away.</p><p>I could start with something small.</p><textarea aria-label="Add an idea of your own (optional)" placeholder="(optional) add an idea…"></textarea></div></div>
+<div class="w" id="w-d1" data-t="something_to_write.txt"><div class="b"><p>A letter to someone who hasn't been born yet. Or the first paragraph of something with no title.</p><textarea aria-label="Add an idea of your own (optional)" placeholder="(optional) add an idea…"></textarea></div></div>
+<div class="w" id="w-d2" data-t="project_i_keep_postponing.txt"><div class="b"><p>Some projects have a name before they have a first step. Maybe the first step is an empty folder.</p><textarea aria-label="Add an idea of your own (optional)" placeholder="(optional) add an idea…"></textarea></div></div>
+<div class="w" id="w-next" data-t="NEXT_STEP.txt"><div class="b" id="nt" style="min-height:110px"></div></div>
+<script>
+const NEXT='present.html'; // next section (PRESENT.exe)
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],R=Math.random,rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let skip=0;const sleep=ms=>new Promise(r=>setTimeout(r,skip?0:ms));
+// ===== AUDIO: slow, quiet, incomplete echo of PASSION's minor-pentatonic motif =====
+let ac,mg,dr,muted=0,quiet=0;const fr=i=>220*Math.pow(2,[0,3,5,7,10,12,15,17][i%8]/12+Math.floor(i/8));
+const vol=()=>mg&&(mg.gain.value=muted?0:1);
+function init(){if(!ac)try{ac=new(window.AudioContext||webkitAudioContext)();mg=ac.createGain();mg.connect(ac.destination);vol()}catch(e){ac=0}ac&&ac.resume()}
+addEventListener('pointerdown',init);addEventListener('keydown',init);
+$('#mu').onclick=()=>{muted=!muted;$('#mu').textContent=muted?'♪ OFF':'♪ ON';vol()};
+function tone(f,d,v,del=0){if(!ac||ac.state!=='running'||quiet)return;const t=ac.currentTime+del,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.3);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(mg);o.start(t);o.stop(t+d+.1)}
+function drone(){if(!ac||dr||quiet)return;dr=ac.createOscillator();const g=ac.createGain();dr.frequency.value=110;g.gain.value=.012;dr.connect(g);g.connect(mg);dr.start();dr.g=g}
+function hush(){quiet=1;if(dr){dr.g.gain.linearRampToValueAtTime(0,ac.currentTime+4);dr.stop(ac.currentTime+4.2)}}
+const motif=()=>{tone(fr(4),2.4,.03);tone(fr(5),2.8,.025,1.2)}; // ends unresolved
+// ===== WINDOWS =====
+let z=10,opened=new Set(),closedAny=0,nextShown=0;
+function place(w,x,y){w.style.left=Math.max(30-w.offsetWidth,Math.min(innerWidth-30,x))+'px';w.style.top=Math.max(28,Math.min(innerHeight-60,y))+'px'}
+function openW(id){const w=$('#w-'+id),n=$$('.w.on').length;if(!w.classList.contains('on')){w.classList.add('on');place(w,Math.max(10,innerWidth*.12)+n*30,60+n*28)}else if(innerWidth>700)place(w,w.offsetLeft,w.offsetTop);w.style.zIndex=++z;opened.add(id);
+ if(id=='doc'&&!w.dataset.r){w.dataset.r=1;intro()}if(id=='blank'||id=='loop'||/^d/.test(id))motif();if(id=='loop')seed();if(id=='next'&&!w.dataset.r){w.dataset.r=1;finale()}}
+$$('.i').forEach(b=>b.onclick=()=>{if(b.dataset.o)openW(b.dataset.o)});
+$$('.w').forEach(w=>{w.insertAdjacentHTML('afterbegin','<div class="t"><button aria-label="Close '+w.dataset.t+'">×</button><span>'+w.dataset.t+'</span><i></i></div>');const t=w.firstChild;let ox,oy;
+ t.firstChild.onclick=()=>{w.classList.remove('on');closedAny=1;maybeNext()};w.addEventListener('pointerdown',()=>w.style.zIndex=++z);
+ t.onpointerdown=e=>{if(e.target.tagName=='BUTTON'||innerWidth<=700)return;ox=e.clientX-w.offsetLeft;oy=e.clientY-w.offsetTop;t.setPointerCapture(e.pointerId);t.onpointermove=m=>place(w,m.clientX-ox,m.clientY-oy)};t.onpointerup=()=>t.onpointermove=null});
+addEventListener('resize',()=>$$('.w.on').forEach(w=>place(w,w.offsetLeft,w.offsetTop)));
+// text reveal: click the document to skip the pauses
+async function type(el,lines){el.innerHTML='';for(const [x,p] of lines){const q=document.createElement('p');el.appendChild(q);const c=document.createElement('span');c.className='cur';q.appendChild(c);for(const ch of x){c.before(ch);if(!rm)await sleep(55)}if(p>=0){await sleep(p);c.remove()}}}
+// ===== OPENING DOCUMENT =====
+async function intro(){drone();motif();$('#dt').addEventListener('pointerdown',()=>skip=1);
+ await type($('#dt'),[['There are so many things I want to make.',2600],['So why is starting the hardest part?',-1]]);await sleep(2500);skip=0;
+ $$('.later').forEach((b,i)=>setTimeout(()=>{b.hidden=false;b.classList.add('show')},rm?0:i*350));setTimeout(()=>showNext(),60000)}
+// ===== THE BLANK PAGE =====
+const bc=$('#bc'),b=bc.getContext('2d');let made=0,pd=0;b.fillStyle='#fff';b.fillRect(0,0,260,150);b.lineWidth=2;b.lineCap='round';b.strokeStyle='#222';
+function mark(){if(!made){made=1;$('#bp').textContent='It looked different in my head.';tone(fr(2),3,.05);$('[data-o=blank]').classList.add('ed')}}
+const xy=e=>{const r=bc.getBoundingClientRect();return[(e.clientX-r.x)/r.width*260,(e.clientY-r.y)/r.height*150]};
+bc.onpointerdown=e=>{pd=1;bc.setPointerCapture(e.pointerId);const[x,y]=xy(e);b.beginPath();b.moveTo(x,y);b.lineTo(x+.1,y+.1);b.stroke()};
+bc.onpointermove=e=>{if(!pd)return;const[x,y]=xy(e);b.lineTo(x,y);b.stroke()};bc.onpointerup=()=>{if(pd){pd=0;mark()}};
+$('#sh').onclick=()=>{b.strokeRect(30+R()*160,20+R()*80,20+R()*50,20+R()*40);mark()};
+// ===== THE REVISION LOOP =====
+const sample=document.createElement('canvas');sample.width=260;sample.height=150;{const s=sample.getContext('2d');s.fillStyle='#fff';s.fillRect(0,0,260,150);s.lineWidth=2;s.strokeStyle='#222';s.beginPath();for(let a=0;a<6.4;a+=.2){const r=40+R()*4;s[a?'lineTo':'moveTo'](130+Math.cos(a)*r,75+Math.sin(a)*r)}s.stroke()}
+let vs=[],n=0,said=0;function seed(){if(!vs.length)revise()}
+function revise(){const a=Math.max(1.2,22/(n+1)),src=made?bc:sample,c=document.createElement('canvas');c.width=260;c.height=150;const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,260,150);g.translate(130+(R()-.5)*a*2,75+(R()-.5)*a*2);g.rotate((R()-.5)*a/30);g.scale(1+(R()-.5)*a/60,1+(R()-.5)*a/60);g.drawImage(src,-130,-75);
+ c.style.opacity=.6;$('#st').appendChild(c);vs.push(c);if(vs.length>8)vs.shift().remove();n++;tone(fr(4-n%3),2.5,.03);vbtn();
+ if(n==3&&!said){said=1;say('Would anyone notice the difference?',4500,'When does making it better become trying to make it impossible to criticize?')}}
+function vbtn(){$('#vb').innerHTML='';vs.forEach((c,i)=>{const k=document.createElement('button');k.className='k';k.textContent='v'+(n-vs.length+i+1);k.onclick=()=>{vs.forEach(x=>x.style.opacity=.25);c.style.opacity=1;c.style.zIndex=++z};$('#vb').appendChild(k)})}
+async function say(a,ms,b){const p=$('#lp');p.textContent=a;if(b){await sleep(ms);p.textContent=b}}
+$('#rv').onclick=revise;
+$('#lv').onclick=()=>{const last=vs[vs.length-1];vs.forEach(c=>{if(c!==last)c.style.opacity=0});setTimeout(()=>{vs=[last];vbtn()},rm?0:1500);last.style.opacity=1;$('#lp').textContent='';$('[data-o=loop]').classList.add('ed');quiet=1;setTimeout(()=>{$('#w-loop').classList.remove('on');closedAny=1;showNext()},rm?0:1800)};
+// ===== TEXT DOCUMENTS =====
+$$('.w textarea').forEach((t,i)=>t.oninput=()=>$('[data-o=d'+i+']').classList.add('ed'));
+// ===== ENDING =====
+function maybeNext(){if(closedAny&&[...opened].filter(x=>x!='doc'&&x!='next').length>=2)showNext()}
+function showNext(){if(nextShown)return;nextShown=1;const b=$('#i-next');b.hidden=false;b.classList.add('show')}
+async function finale(){hush();skip=0;await type($('#nt'),[['What if I don’t need to know how to finish it before I begin?',2800],['Maybe the next step doesn’t have to prove anything.',-1]]);await sleep(3000);$('#nt').insertAdjacentHTML('beforeend','<a class="go" href="'+NEXT+'">Continue →</a>')}
+</script></body></html>

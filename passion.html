@@ -1,0 +1,137 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PASSION.exe — The Learning Loop</title><style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#111;font:12px "Courier New",monospace;user-select:none;touch-action:none}
+button{font:inherit;cursor:pointer;background:#c0c0c0;border:2px outset #fff;padding:3px 7px;color:#000}button[aria-pressed=true]{border-style:inset;background:#ff8;}
+#sf{position:fixed;inset:0;z-index:20;cursor:crosshair;background:#e9e9e9 repeating-linear-gradient(0deg,#0001 0 1px,transparent 1px 24px),repeating-linear-gradient(90deg,#0001 0 1px,transparent 1px 24px)}
+#sb{position:absolute;top:10px;left:14px;color:#999;font-size:10px;letter-spacing:.15em}#an{position:absolute;left:62%;top:38%;width:7px;height:7px;background:#111;transition:transform .3s}
+#fx{position:fixed;inset:0;z-index:30;pointer-events:none}
+#ds{position:fixed;inset:0;visibility:hidden;background:radial-gradient(#0004 1px,transparent 1.5px) 0 0/4px 4px,linear-gradient(135deg,#ff3ea5,#ffd23f 35%,#2de2e6 65%,#6a4cff)}
+#ds::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#0002 0 1px,transparent 1px 3px);z-index:9}
+#ds.pop{animation:pop .6s ease-out}@keyframes pop{from{transform:scale(1.12);filter:saturate(3)}}
+#lk{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}#lk line{stroke:#fff;stroke-width:3;stroke-dasharray:6 4;filter:drop-shadow(0 0 2px #000)}
+.d{position:absolute;opacity:.8;animation:fl 5s ease-in-out infinite alternate}@keyframes fl{to{transform:translateY(-14px) rotate(25deg)}}
+.w{position:absolute;display:none;background:#c0c0c0;border:2px outset #fff;box-shadow:4px 4px 0 #0007;width:min(240px,94vw);color:#000}.w.on{display:block}
+.t{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:3px;cursor:move;touch-action:none}.t button{padding:0 6px}
+.b{padding:6px}.b canvas{display:block;max-width:100%;background:#000;image-rendering:pixelated;touch-action:none}.b p{margin:6px 0;min-height:3em}.b small{display:block;margin-top:4px;color:#444}.b input{width:100%}
+pre{margin:4px 0;background:#fff;padding:4px;font-size:11px}.row{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}.rel{outline:2px dashed #f0f}
+#w-proj{background:#f6f6f6;border:1px solid #888;box-shadow:0 0 0 6px #fff8,0 8px 30px #0006;width:min(250px,94vw)}#w-proj .t{background:#ddd;color:#333}#w-proj canvas{background:#fff;border:1px solid #ddd}
+#end p{animation:fi 2.5s both;margin:8px 0 0;font:14px Georgia,serif;color:#333}#end a{display:inline-block;margin-top:10px;color:#333;animation:fi 2s both}@keyframes fi{from{opacity:0}}
+#line{position:fixed;left:50%;bottom:46px;transform:translateX(-50%);z-index:40;max-width:92vw;background:#000;color:#fff;padding:6px 12px;opacity:0;transition:opacity 1s;pointer-events:none;text-align:center}
+body:not(.open) #line{bottom:30px;background:none;color:#555}
+#tb{position:fixed;left:0;right:0;bottom:0;height:36px;z-index:35;background:#c0c0c0;border-top:2px outset #fff;display:none;gap:4px;padding:4px;overflow-x:auto}body.open #tb{display:flex}
+#mu{position:fixed;top:8px;right:8px;z-index:41}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="ds"><svg id="lk"></svg>
+<div class="w" id="w-games" data-t="GAMES.EXE"><div class="b"><canvas id="gc" width="200" height="120"></canvas><small>Arrows or tap. Things can be pushed.</small></div></div>
+<div class="w" id="w-code" data-t="SOURCE_CODE.EXE"><div class="b"><canvas id="cc" width="200" height="100"></canvas><pre id="cp"></pre><input id="cs" type="range" min="3" max="12" value="4" aria-label="sides"></div></div>
+<div class="w" id="w-music" data-t="MUSIC PLAYER"><div class="b"><canvas id="mc" width="200" height="50"></canvas><div class="row"><button data-l="beat" aria-pressed="false">BEAT</button><button data-l="arp" aria-pressed="false">ARP</button><button data-l="bells" aria-pressed="false">BELLS</button></div></div></div>
+<div class="w" id="w-book" data-t="THE BOOKSHELF"><div class="b"><div class="row"><button class="bk" style="background:#c0392b;color:#fff">HOMER</button><button class="bk" style="background:#27ae60;color:#fff">QUIXOTE</button><button class="bk" style="background:#2c3e8f;color:#fff">ARTHUR</button></div><p id="bp">Pick a spine.</p></div></div>
+<div class="w" id="w-hist" data-t="HISTORY.DOC"><div class="b"><div class="row" id="hb"></div><p id="hp">Pick a moment.</p></div></div>
+<div class="w" id="w-math" data-t="MATH.EXE"><div class="b"><canvas id="mt" width="200" height="140"></canvas><small>Drag the points.</small></div></div>
+<div class="w" id="w-proj" data-t="UNTITLED_PROJECT.EXE"><div class="b"><canvas id="pc" width="220" height="110"></canvas><div id="end"></div></div></div>
+</div>
+<div id="sf"><div id="sb">PASSION.exe · SURFACE · NOMINAL</div><div id="an"></div></div><canvas id="fx"></canvas><div id="line" aria-live="polite"></div>
+<div id="tb"><button data-w="games">GAMES</button><button data-w="code">CODE</button><button data-w="music">MUSIC</button><button data-w="book">BOOKS</button><button data-w="hist">HISTORY</button><button data-w="math">MATH</button><button data-w="proj">PROJECT</button></div>
+<button id="mu" aria-label="Toggle sound">♪ ON</button>
+<script>
+const NEXT='questioning.html'; // next section
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],rm=matchMedia('(prefers-reduced-motion:reduce)').matches,R=Math.random;
+// ===== AUDIO (Web Audio, starts after first gesture) =====
+let ac,mg,ana,muted=0,quiet=0,step=0,nt=0;const L={pulse:0,bed:0,beat:0,arp:0,bells:0};
+const vol=()=>mg&&(mg.gain.value=muted?0:quiet?.3:.5);
+function initAudio(){if(!ac)try{ac=new(window.AudioContext||webkitAudioContext)();mg=ac.createGain();ana=ac.createAnalyser();ana.fftSize=64;mg.connect(ana);ana.connect(ac.destination);vol();setInterval(tick,100)}catch(e){ac=null}ac&&ac.resume()}
+addEventListener('pointerdown',initAudio);addEventListener('keydown',initAudio);
+$('#mu').onclick=()=>{muted=!muted;$('#mu').textContent=muted?'♪ OFF':'♪ ON';vol()};
+const on=()=>ac&&ac.state==='running';
+function tone(f,t,d,ty,v){const o=ac.createOscillator(),g=ac.createGain();o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(mg);o.start(t);o.stop(t+d+.05)}
+function noise(t,d,v){const n=ac.sampleRate*d|0,b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(R()*2-1)*(1-i/n);const s=ac.createBufferSource(),g=ac.createGain();g.gain.value=v;s.buffer=b;s.connect(g);g.connect(mg);s.start(t)}
+const fr=i=>220*Math.pow(2,[0,3,5,7,10,12,15,17][i%8]/12+Math.floor(i/8));
+const blip=(i,ty='square',v=.07,d=.15)=>{if(on())tone(fr(i),ac.currentTime,d,ty,v)};
+function tick(){if(!on())return;if(nt<ac.currentTime)nt=ac.currentTime+.05;while(nt<ac.currentTime+.3){const s=step++,t=nt;
+if(L.pulse&&s%4==0)tone(110,t,.1,'square',.03);
+if(L.bed&&s%8==0)tone([110,87.3,98,82.4][(s>>3)%4],t,1.6,'triangle',quiet?.05:.1);
+if(L.beat){if(s%4==0)tone(60,t,.15,'sine',.25);if(s%4==2)noise(t,.05,.08)}
+if(L.arp&&s%2==0)tone(fr([0,2,4,2,5,4,2,1][(s>>1)%8]+8),t,.12,'square',.05);
+if(L.bells&&s%8==3)tone(fr(7+s%5)*2,t,.6,'sine',.06);
+if(quiet&&s%16==4){const n=[[4,5],[4,6]][(s>>4)%2];tone(fr(n[0]),t,.8,'sine',.05);tone(fr(n[1]),t+.5,1.2,'sine',.04)}
+nt+=.25}}
+// ===== CAPTIONS + LINKS BETWEEN WINDOWS =====
+const seen=new Set();let ft;function say(k,x){if(seen.has(k))return;seen.add(k);const e=$('#line');e.textContent=x;e.style.opacity=1;clearTimeout(ft);ft=setTimeout(()=>e.style.opacity=0,5200)}
+const links=new Set();function link(a,b){if(links.has(a+b))return;links.add(a+b);const l=document.createElementNS('http://www.w3.org/2000/svg','line');l.dataset.a=a;l.dataset.b=b;$('#lk').appendChild(l);blip(9,'triangle',.09,.5);blip(12,'triangle',.07,.6);pos()}
+function pos(){$$('#lk line').forEach(l=>{const a=$('#w-'+l.dataset.a),b=$('#w-'+l.dataset.b),v=a.classList.contains('on')&&b.classList.contains('on');l.style.display=v?'':'none';if(!v)return;const r=a.getBoundingClientRect(),q=b.getBoundingClientRect();l.setAttribute('x1',r.x+r.width/2);l.setAttribute('y1',r.y+r.height/2);l.setAttribute('x2',q.x+q.width/2);l.setAttribute('y2',q.y+q.height/2)})}
+// ===== ACT I: GLASS SURFACE =====
+const sf=$('#sf'),fx=$('#fx'),c=fx.getContext('2d'),an=$('#an');let len=0,rup=0,TH,hue=0,st1=0,down=0,moved=0,lx,ly,ax=0,ay=0;
+function fit(){fx.width=innerWidth;fx.height=innerHeight;TH=Math.min(9000,(innerWidth+innerHeight)*4)}fit();
+function seg(x1,y1,x2,y2){len+=Math.hypot(x2-x1,y2-y1);hue=(hue+23)%360;c.lineCap='round';c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.strokeStyle='hsla('+hue+',100%,55%,.55)';c.lineWidth=6;c.stroke();c.strokeStyle='#111';c.lineWidth=1.5;c.stroke();c.fillStyle='hsl('+hue+',100%,50%)';c.fillRect(x2+(R()*14-7|0),y2+(R()*14-7|0),4,4)}
+function ray(x,y,a,d){for(let k=0,n=4+R()*5;k<n;k++){const nx=x+Math.cos(a)*(8+R()*16),ny=y+Math.sin(a)*(8+R()*16);seg(x,y,nx,ny);x=nx;y=ny;a+=(R()-.5)*.7;if(d<2&&R()<.14)ray(x,y,a+(R()<.5?1:-1)*.9,d+1)}}
+function prog(){if(rup)return;const p=len/TH;if(!st1&&len>0){st1=1;if(on()){const t=ac.currentTime;tone(1318,t,.9,'sine',.12);tone(1760,t+.05,.7,'sine',.08);setTimeout(()=>blip(5),180);setTimeout(()=>blip(8),340)}}
+if(p>.25)L.pulse=1;if(p>.5)say('q','What else is in there?');if(p>.6)L.beat=1;if(p>=1)rupture()}
+sf.onpointerdown=e=>{down=1;moved=0;lx=e.clientX;ly=e.clientY;sf.setPointerCapture(e.pointerId)};
+sf.onpointermove=e=>{const x=e.clientX,y=e.clientY,r=an.getBoundingClientRect(),dx=r.x-x,dy=r.y-y,d=Math.hypot(dx,dy)||1;
+if(d<90){ax=Math.max(-140,Math.min(140,ax+dx/d*12));ay=Math.max(-140,Math.min(140,ay+dy/d*12));an.style.transform='translate('+ax+'px,'+ay+'px)';say('a',"That wasn't supposed to move.")}
+if(down&&Math.hypot(x-lx,y-ly)>16){moved=1;seg(lx,ly,x,y);if(R()<.3)ray(x,y,R()*6.28,1);lx=x;ly=y;prog()}};
+sf.onpointerup=e=>{if(down&&!moved){for(let i=0;i<5;i++)ray(e.clientX,e.clientY,R()*6.28,0)}down=0;prog()};
+addEventListener('keydown',e=>{if(!rup&&(e.key==' '||e.key=='Enter')){const x=R()*innerWidth,y=R()*innerHeight;for(let i=0;i<5;i++)ray(x,y,R()*6.28,0);prog()}});
+// ===== ACT II: RUPTURE =====
+function rupture(){rup=1;sf.style.display='none';L.beat=0;L.bed=1;if(on()){const t=ac.currentTime;noise(t,.6,.4);tone(80,t,.5,'sawtooth',.2);tone(160,t,.3,'square',.1)}
+document.body.classList.add('open');$('#ds').style.visibility='visible';
+const ids=innerWidth<700?['games','code','music','proj']:['games','code','music','book','hist','math','proj'];ids.forEach((id,i)=>setTimeout(()=>openW(id,1),rm?0:i*140+250));
+if(!rm){$('#ds').classList.add('pop');shatter()}else c.clearRect(0,0,fx.width,fx.height);
+for(let i=0;i<8;i++){const d=document.createElement('div');d.className='d';d.style.cssText='left:'+R()*95+'%;top:'+R()*85+'%;width:'+(8+R()*22)+'px;height:'+(8+R()*22)+'px;background:hsl('+R()*360+',90%,55%);'+(i%2?'border-radius:50%':'');$('#ds').prepend(d)}
+loop()}
+function shatter(){const w=fx.width,h=fx.height,cw=Math.ceil(w/16),ch=Math.ceil(h/10),P=[];for(let i=0;i<16;i++)for(let j=0;j<10;j++){const x=i*cw+cw/2,y=j*ch+ch/2,a=Math.atan2(y-h/2,x-w/2)+(R()-.5),s=6+R()*14;P.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-4,r:0,vr:(R()-.5)*.4,g:200+R()*50|0})}
+let f=0;(function a(){c.clearRect(0,0,w,h);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.6;p.r+=p.vr;c.save();c.globalAlpha=Math.max(0,1-f/50);c.translate(p.x,p.y);c.rotate(p.r);c.fillStyle='rgb('+p.g+','+p.g+','+p.g+')';c.strokeStyle='#111';c.fillRect(-cw/2,-ch/2,cw*.85,ch*.85);c.strokeRect(-cw/2,-ch/2,cw*.85,ch*.85);c.restore()});if(++f<55)requestAnimationFrame(a);else c.clearRect(0,0,w,h)})()}
+// ===== ACT III: WINDOWS =====
+const DEF={games:[.04,.06],code:[.36,.05],music:[.74,.08],book:[.06,.52],hist:[.4,.48],math:[.74,.5],proj:[.55,.72]};let z=10;
+function place(w,x,y){w.style.left=Math.max(40-w.offsetWidth,Math.min(innerWidth-40,x))+'px';w.style.top=Math.max(0,Math.min(innerHeight-80,y))+'px'}
+function home(w){const d=DEF[w.id.slice(2)];place(w,(innerWidth-w.offsetWidth)*d[0],(innerHeight-60-w.offsetHeight)*d[1])}
+function openW(id,reset){const w=$('#w-'+id);if(!w.classList.contains('on')){w.classList.add('on');reset=1}if(reset)home(w);w.style.zIndex=++z;pos()}
+$$('.w').forEach(w=>{w.insertAdjacentHTML('afterbegin','<div class="t"><span>'+w.dataset.t+'</span><button class="x" aria-label="Close '+w.dataset.t+'">×</button></div>');const t=w.firstChild;let ox,oy;
+t.querySelector('.x').onclick=()=>{w.classList.remove('on');pos()};w.addEventListener('pointerdown',()=>w.style.zIndex=++z);
+t.onpointerdown=e=>{if(e.target.tagName=='BUTTON')return;ox=e.clientX-w.offsetLeft;oy=e.clientY-w.offsetTop;t.setPointerCapture(e.pointerId);t.onpointermove=m=>{place(w,m.clientX-ox,m.clientY-oy);pos()}};t.onpointerup=()=>t.onpointermove=null});
+$$('#tb [data-w]').forEach(b=>b.onclick=()=>openW(b.dataset.w,1)); // taskbar also recovers lost windows
+addEventListener('resize',()=>{fit();$$('.w.on').forEach(w=>place(w,w.offsetLeft,w.offsetTop));pos()});
+// GAMES.EXE
+const gc=$('#gc'),g=gc.getContext('2d');let px=1,py=3,gl=0,tg=null,iv=0;const BL=[{x:4,y:2,c:'#2de2e6'},{x:5,y:4,c:'#ffd23f'},{x:8,y:1,c:'#ff3ea5',code:1}];
+function gdraw(){g.fillStyle='#1b1b3a';g.fillRect(0,0,200,120);for(let i=0;i<10;i++)for(let j=0;j<6;j++)if((i+j)%2){g.fillStyle='#232350';g.fillRect(i*20,j*20,20,20)}
+BL.forEach(b=>{g.fillStyle=b.c;g.fillRect(b.x*20+2,b.y*20+2,16,16);if(b.code){g.fillStyle='#000';g.font='bold 11px monospace';g.fillText('{}',b.x*20+5,b.y*20+14)}});g.fillStyle='#ff8';g.fillRect(px*20+3,py*20+3,14,14);g.fillStyle='#000';g.fillRect(px*20+6,py*20+7,2,3);g.fillRect(px*20+12,py*20+7,2,3)}
+function mv(dx,dy){const nx=px+dx,ny=py+dy;if(nx<0||ny<0||nx>9||ny>5)return 0;const b=BL.find(q=>q.x==nx&&q.y==ny);if(b){const bx=nx+dx,by=ny+dy;if(bx<0||by<0||bx>9||by>5||BL.some(q=>q.x==bx&&q.y==by))return 0;b.x=bx;b.y=by;blip(3,'square',.05,.08);if(b.code&&!gl){gl=1;say('g',"I didn't only want to play. I wanted to know how these worlds were made.");link('games','code');cdraw()}}px=nx;py=ny;blip(0,'square',.03,.05);gdraw();return 1}
+gc.onpointerdown=e=>{const r=gc.getBoundingClientRect();tg=[(e.clientX-r.x)/r.width*10|0,(e.clientY-r.y)/r.height*6|0];clearInterval(iv);iv=setInterval(()=>{const dx=Math.sign(tg[0]-px),dy=Math.sign(tg[1]-py);if(!(dx||dy)||!mv(dx||0,dx?0:dy))clearInterval(iv)},130)};
+addEventListener('keydown',e=>{const k={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(k&&rup&&$('#w-games').classList.contains('on')){e.preventDefault();mv(k[0],k[1])}});
+// SOURCE_CODE.EXE
+const cs=$('#cs'),cg=$('#cc').getContext('2d');
+function cdraw(){const n=+cs.value,col=gl?'#ff3ea5':'hsl('+n*30+',90%,60%)';cg.fillStyle='#000';cg.fillRect(0,0,200,100);cg.beginPath();for(let i=0;i<n;i++){const a=i/n*6.283-1.57;cg[i?'lineTo':'moveTo'](100+Math.cos(a)*40,50+Math.sin(a)*40)}cg.closePath();cg.fillStyle=col;cg.fill();$('#cp').textContent='polygon(\n  sides = '+n+',\n  fill = "'+col+'"\n)'}
+cs.oninput=()=>{cdraw();say('c','Understanding became another way of creating.');blip(+cs.value-3)};
+// MUSIC PLAYER (visualizer + shape pulse)
+const mc=$('#mc').getContext('2d'),mt=$('#mt'),mx=mt.getContext('2d');let pulse=0;
+$$('[data-l]').forEach(b=>b.onclick=()=>{const k=b.dataset.l;L[k]=L[k]?0:1;b.setAttribute('aria-pressed',!!L[k]);if(quiet){quiet=0;vol()}say('m','Not everything I loved needed to become something useful.');blip(7,'triangle');if(k=='arp'&&L.arp)link('music','math')});
+function level(){if(on()){const d=new Uint8Array(ana.frequencyBinCount);ana.getByteFrequencyData(d);return d.reduce((a,b)=>a+b,0)/d.length/120}return L.beat||L.arp||L.bells?.5+.5*Math.sin(Date.now()/180):0}
+// THE BOOKSHELF
+const BK=['A long road home, and every stop along it teaches something new.','He read until the world rearranged itself. Windmills became questions.','A round table, so no seat is the head. A sword only some hands could draw.'],op=new Set();
+$$('.bk').forEach((b,i)=>b.onclick=()=>{$('#bp').textContent=BK[i];op.add(i);say('b','Some worlds were built from words.');blip(2+i*2,'triangle');if(op.size>1)link('book','hist')});
+// HISTORY.DOC
+const EV=[['c. 8th century BC · Homer','Tales of Troy and a long voyage home, told aloud before anyone wrote them down.',[2]],['1605 · Don Quixote','A reader so lost in knight stories that he sets out to live one.',[0,2]],['c. 1136 · Arthur on the page','A legendary king is written down; later tellers keep adding to him.',[1]],['1972 · Pong','A bouncing dot and two paddles. A world made of rules someone wrote.',[]]];
+EV.forEach((e,i)=>{const b=document.createElement('button');b.textContent=e[0].split(' · ')[0];b.onclick=()=>{$$('#hb button').forEach(x=>x.classList.remove('rel'));e[2].forEach(j=>$$('#hb button')[j].classList.add('rel'));$('#hp').textContent=e[0]+'. '+e[1]+(e[2].length?' ↔ '+e[2].map(j=>EV[j][0].split(' · ')[0]).join(', '):'');say('h','The present was full of stories that began long before me.');blip(i*2,'triangle');if(i==3)link('hist','games')};$('#hb').appendChild(b)});
+// MATH.EXE
+const P=[[40,110],[160,110],[100,30]];let dr=-1;
+function circ(){const[[a,b],[c1,d1],[e,f]]=P,D=2*(a*(d1-f)+c1*(f-b)+e*(b-d1));if(Math.abs(D)<1)return 0;const A=a*a+b*b,B=c1*c1+d1*d1,C=e*e+f*f,ux=(A*(d1-f)+B*(f-b)+C*(b-d1))/D,uy=(A*(e-c1)+B*(a-e)+C*(c1-a))/D;return[ux,uy,Math.hypot(a-ux,b-uy)]}
+function mdraw(){mx.fillStyle='#000';mx.fillRect(0,0,200,140);const k=circ();if(k&&k[2]<500){mx.strokeStyle='#2de2e6';mx.lineWidth=1+pulse*2;mx.beginPath();mx.arc(k[0],k[1],k[2]*(1+pulse*.05),0,6.283);mx.stroke()}
+mx.strokeStyle='#ffd23f';mx.lineWidth=2;mx.beginPath();P.forEach((p,i)=>mx[i?'lineTo':'moveTo'](p[0],p[1]));mx.closePath();mx.stroke();mx.fillStyle='#ff3ea5';P.forEach(p=>mx.fillRect(p[0]-4,p[1]-4,8,8))}
+const mxy=e=>{const r=mt.getBoundingClientRect();return[(e.clientX-r.x)/r.width*200,(e.clientY-r.y)/r.height*140]};
+mt.onpointerdown=e=>{const[x,y]=mxy(e);dr=P.findIndex(p=>Math.hypot(p[0]-x,p[1]-y)<20);if(dr>=0)mt.setPointerCapture(e.pointerId)};
+mt.onpointermove=e=>{if(dr<0)return;const[x,y]=mxy(e);P[dr]=[Math.max(0,Math.min(200,x)),Math.max(0,Math.min(140,y))];say('t',"Not understanding something yet didn't make it less interesting.");if(R()<.1)blip(R()*8|0,'sine',.05)};mt.onpointerup=()=>dr=-1;
+// ===== ACT IV: UNTITLED_PROJECT.EXE =====
+const pc=$('#pc'),p=pc.getContext('2d');let pd=0,drew=0,et=0,ended=0;p.lineWidth=2;p.lineCap='round';p.strokeStyle='#444';
+function startEnd(ms){if(ended)return;clearTimeout(et);et=setTimeout(finale,ms)}
+function quietMode(){if(quiet)return;quiet=1;L.beat=L.arp=L.bells=0;$$('[data-l]').forEach(b=>b.setAttribute('aria-pressed','false'));vol()}
+$('#w-proj').addEventListener('pointerdown',()=>{quietMode();startEnd(26000)}); // Path B: quiet pause, then the same ending
+const pxy=e=>{const r=pc.getBoundingClientRect();return[(e.clientX-r.x)/r.width*220,(e.clientY-r.y)/r.height*110]};
+pc.onpointerdown=e=>{pd=1;pc.setPointerCapture(e.pointerId);const[x,y]=pxy(e);p.beginPath();p.moveTo(x,y)};
+pc.onpointermove=e=>{if(!pd)return;const[x,y]=pxy(e);drew=1;p.lineTo(x+R()*1.6-.8,y+R()*1.6-.8);p.stroke()}; // slightly wobbly on purpose, never corrected
+pc.onpointerup=()=>{pd=0;if(drew)startEnd(3000)}; // Path A
+function finale(){ended=1;const e=$('#end');e.innerHTML='<p>I know what I want to make.</p>';setTimeout(()=>e.insertAdjacentHTML('beforeend',"<p>I'm just not sure I can make it good enough.</p>"),3800);setTimeout(()=>e.insertAdjacentHTML('beforeend','<a href="'+NEXT+'">Continue →</a>'),8000)}
+// ===== MAIN LOOP =====
+function loop(){const lv=level();pulse+=(lv-pulse)*.3;if($('#w-music').classList.contains('on')){mc.fillStyle='#000';mc.fillRect(0,0,200,50);if(on()){const d=new Uint8Array(ana.frequencyBinCount);ana.getByteFrequencyData(d);d.forEach((v,i)=>{mc.fillStyle='hsl('+i*11+',90%,55%)';const h=v/255*48;mc.fillRect(i*6+2,50-h,5,h)})}else for(let i=0;i<32;i++){mc.fillStyle='hsl('+i*11+',90%,55%)';mc.fillRect(i*6+2,47,5,3)}}
+if($('#w-math').classList.contains('on'))mdraw();requestAnimationFrame(loop)}
+gdraw();cdraw();mdraw();
+</script></body></html>
