@@ -12,9 +12,9 @@
   .desktop{position:fixed;inset:0;background:#c0c0c0;overflow:hidden}
   /* A tall, scrollable desktop: part Windows 95, part old personal webpage. */
   .workspace{position:absolute;inset:0 0 34px 0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-color:#c0c0c0 #808080;scrollbar-width:auto}
-  .workspace-canvas{position:relative;width:100%;min-width:320px;height:2050px;min-height:2050px;background:linear-gradient(145deg,#000080 0%,#003b8e 24%,#087f9a 54%,#4ba8c2 78%,#a4d7e5 100%);background-attachment:local}
+  .workspace-canvas{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:24px 20px;width:100%;min-width:320px;min-height:100%;padding:70px clamp(12px,5vw,70px) 80px;background:linear-gradient(145deg,#000080 0%,#003b8e 24%,#087f9a 54%,#4ba8c2 78%,#a4d7e5 100%);background-attachment:local}
   .workspace-canvas::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.12;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.12) 4px);}
-  .window{position:absolute;left:var(--x,120px);top:var(--y,70px);width:min(var(--w,470px),calc(100% - 22px));height:var(--h,310px);max-height:calc(100vh - 86px);display:flex;flex-direction:column;background:var(--gray);border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #111;z-index:3;min-width:260px;min-height:120px}
+  .window{position:relative;left:auto;top:auto;width:min(var(--w,470px),100%);height:auto;max-height:none;display:flex;flex-direction:column;align-self:start;background:var(--gray);border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #111;z-index:3;min-width:0;min-height:0}
   .window.hidden{display:none}
   .titlebar{height:25px;flex:0 0 25px;background:var(--navy);color:white;display:flex;align-items:center;gap:6px;padding:2px 3px 2px 6px;cursor:move;user-select:none;touch-action:none}
   .titlebar .title{font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
@@ -24,13 +24,12 @@
   .win-btn:active,.classic-btn:active{border-color:#404040 #fff #fff #404040;padding-top:1px;padding-left:1px}
   .menu-strip{height:25px;display:flex;align-items:center;gap:16px;padding:2px 8px;border-bottom:1px solid #aaa;color:#222}
   .menu-strip u{text-underline-offset:2px}
-  .window-content{padding:12px;overflow:auto;flex:1;min-height:0;background:var(--gray)}
-  .inset{border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;padding:12px;min-height:100%}
+  .window-content{padding:12px;overflow:visible;flex:0 0 auto;min-height:0;background:var(--gray)}
+  .inset{border:2px solid;border-color:#808080 #fff #fff #808080;background:#fff;padding:12px;min-height:0}
   h1,h2,h3{margin:0 0 10px;font-weight:normal}h1{font-size:22px}h2{font-size:17px}p{line-height:1.55;margin:0 0 12px} .hint{color:#555;font-size:12px}
   .classic-btn{background:var(--gray);border:2px solid;border-color:#fff #404040 #404040 #fff;padding:4px 12px;min-height:25px}
-  .image-frame{background:#fff;border:2px solid;border-color:#808080 #fff #fff #808080;padding:5px;display:flex;flex-direction:column;gap:6px;min-height:100%}
-  .image-frame img{display:block;max-width:100%;max-height:calc(100vh - 220px);object-fit:contain;align-self:center}
-  .image-placeholder{min-height:140px;background:#e8e8e8;border:1px dashed #777;display:grid;place-items:center;text-align:center;padding:20px;color:#555}
+  .image-frame{background:#fff;border:2px solid;border-color:#808080 #fff #fff #808080;padding:5px;display:flex;flex-direction:column;gap:6px;min-height:0}
+  .image-frame img{display:block;max-width:100%;max-height:50vh;object-fit:contain;align-self:center}
   .caption{font-size:12px;color:#333;padding:3px}
   .taskbar{position:fixed;left:0;right:0;bottom:0;height:34px;background:var(--gray);border-top:2px solid #fff;display:flex;align-items:center;padding:3px;gap:5px;z-index:100}
   .start-button{display:flex;align-items:center;gap:5px;height:26px;padding:2px 8px;font-weight:bold}
@@ -48,12 +47,10 @@
   .start-separator{border:0;border-top:1px solid #808080;border-bottom:1px solid white;margin:4px 0}
   .statusbar{height:22px;flex:0 0 22px;border-top:1px solid #fff;display:flex;align-items:center;padding:2px 7px;color:#333;font-size:11px;gap:8px}
   .status-chip{border:1px solid #888;border-color:#888 #fff #fff #888;padding:2px 7px}
-  @media(max-width:600px){.workspace-canvas{height:2300px;min-height:2300px}.window{height:min(64vh,440px)!important;max-height:calc(100vh - 115px)}.task-item{min-width:70px}.tray{padding:0 5px;font-size:11px}}
+  @media(max-width:600px){.task-item{min-width:70px}.tray{padding:0 5px;font-size:11px}}
 
   /* Windows 95-inspired purple/blue setup gradient, carried through the entire scrollable canvas. */
-  .workspace-canvas{height:6800px!important;min-height:6800px!important;background:linear-gradient(145deg,#16004b 0%,#261078 22%,#3932a6 46%,#2867c7 70%,#72b5e8 100%);background-repeat:no-repeat;background-size:100% 100%;}
-  .workspace-canvas::after{height:100%;}
-  .window{max-width:calc(100% - 24px)}
+  .workspace-canvas{background:linear-gradient(145deg,#16004b 0%,#261078 22%,#3932a6 46%,#2867c7 70%,#72b5e8 100%);background-repeat:no-repeat;background-size:100% 100%;}
   .music-player{position:fixed;right:12px;bottom:44px;width:280px;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:2px 2px 0 rgba(0,0,0,.45);z-index:150}
   .music-titlebar{height:25px;background:#000080;color:#fff;display:flex;align-items:center;gap:7px;padding:2px 3px 2px 7px;cursor:move;user-select:none;touch-action:none}
   .music-titlebar strong{font-size:12px;flex:1}.music-window-controls{display:flex;gap:3px}
@@ -64,18 +61,17 @@
   .track-progress{display:flex;align-items:center;gap:4px;font-size:10px;margin-top:5px}.track-progress input{min-width:0;width:100%;height:12px}
   .music-player.minimized{display:none}.music-player.expanded{width:340px}.music-player.expanded .album-art{width:100px;height:100px;flex-basis:100px}
   .music-mini{position:fixed;right:12px;bottom:43px;z-index:150}
-  @media(max-width:700px){.workspace-canvas{width:100%;height:8200px!important;min-height:8200px!important}.window{left:3%!important;width:94%!important;max-width:94%;height:auto!important;min-height:280px;max-height:none;position:absolute}.music-player{right:6px;bottom:42px;width:min(280px,calc(100vw - 12px))}.music-player.expanded{width:min(340px,calc(100vw - 12px))}.music-player .music-body{padding:6px}.album-art{width:65px;height:65px;flex-basis:65px}}
-@media(max-width:700px){#reflection-txt-notepad-1{top:100px!important;}#presentation-jpg-picture-2{top:425px!important;}#reflection-txt-notepad-3{top:750px!important;}#artifact-01-jpg-picture--4{top:1075px!important;}#observation-html-interne-5{top:1400px!important;}#artifact-02-jpg-picture--6{top:1725px!important;}#curiosity-html-internet--7{top:2050px!important;}#artifact-03-jpg-picture--8{top:2375px!important;}#artifact-04-jpg-picture--9{top:2700px!important;}#school-html-internet-exp-10{top:3025px!important;}#artifact-05-jpg-picture--11{top:3350px!important;}#passion-html-internet-ex-12{top:3675px!important;}#artifact-06-jpg-picture--13{top:4000px!important;}#questioning-html-interne-14{top:4325px!important;}#artifact-07-jpg-picture--15{top:4650px!important;}#present-html-internet-ex-16{top:4975px!important;}#artifact-08-jpg-picture--17{top:5300px!important;}#lifelong-html-internet-e-18{top:5625px!important;}#artifact-09-jpg-picture--19{top:5950px!important;}#reflection-txt-notepad-20{top:6275px!important;}#presentation-jpg-picture-21{top:6600px!important;}#presentation-jpg-picture-22{top:6925px!important;}#presentation-jpg-picture-23{top:7250px!important;}#reflection-txt-notepad-24{top:7575px!important;}#reflection-txt-notepad-25{top:7900px!important;}}</style>
+  @media(max-width:700px){.workspace-canvas{grid-template-columns:minmax(0,1fr);gap:18px;padding:52px 12px 70px}.window{width:min(var(--w,470px),100%)}.music-player{right:6px;bottom:42px;width:min(280px,calc(100vw - 12px))}.music-player.expanded{width:min(340px,calc(100vw - 12px))}.music-player .music-body{padding:6px}.album-art{width:65px;height:65px;flex-basis:65px}}</style>
 </head>
 <body>
 <div aria-label="Scrollable Windows 95-inspired desktop" class="desktop" id="desktop">
 <main aria-label="Scrollable desktop workspace" class="workspace" id="workspace">
-<div class="workspace-canvas" id="workspaceCanvas" style="min-height:6800px;height:6800px">
-<!-- WINDOW TEMPLATE: duplicate a .window block, give it a unique id, and set --x, --y, --w, --h. -->
+<div class="workspace-canvas" id="workspaceCanvas">
+<!-- Add windows in timeline order; the grid lays them out without overlap. -->
 <section aria-label="Reflection text window" class="window" id="reflection-txt-notepad-1" style="--x:5%;--y:70px;--w:500px;--h:420px">
 <div class="titlebar"><span class="mini-icon">📝</span><span class="title">Reflection.txt — Notepad</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="reflection-txt-notepad-1">_</button><button aria-label="Maximize" class="win-btn" data-maximize="reflection-txt-notepad-1">□</button><button aria-label="Close" class="win-btn" data-close="reflection-txt-notepad-1">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span></div>
-<div class="window-content"><div class="inset" contenteditable="true" spellcheck="true">
+<div class="window-content"><div class="inset" spellcheck="true">
 <h1>REFLECTION.exe</h1>
 <p class="hint">Why, what, when</p>
 <p><em>[~]$ whoami</em></p>
@@ -88,10 +84,8 @@
 <div class="titlebar"><span class="mini-icon">📷</span><span class="title">presentation.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="presentation-jpg-picture-2">_</button><button aria-label="Maximize" class="win-btn" data-maximize="presentation-jpg-picture-2">□</button><button aria-label="Close" class="win-btn" data-close="presentation-jpg-picture-2">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your presentation photo at assets/artifacts/presentation.jpg, or change this src. -->
-<div class="image-placeholder" data-placeholder="presentation.jpg"><div><strong>PRESENTATION PHOTO</strong><br/><br/>Put your photo in<br/><code>assets/artifacts/presentation.jpg</code></div></div>
-<img alt="Photograph of my class presentation" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/presentation.jpg"/>
-<div class="caption" contenteditable="true">My presentation — The only stuff i could find where I'm currently staying at. Needless to say I got creative lol.</div>
+<img alt="Photograph of my class presentation" src="assets/artifacts/presentation.png"/>
+<div class="caption">My presentation — The only stuff i could find where I'm currently staying at. Needless to say I got creative lol.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -99,7 +93,7 @@
 <section aria-label="Reflection text window" class="window" id="reflection-txt-notepad-3" style="--x:5%;--y:535px;--w:500px;--h:410px">
 <div class="titlebar"><span class="mini-icon">📝</span><span class="title">Reflection.txt — Notepad</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="reflection-txt-notepad-3">_</button><button aria-label="Maximize" class="win-btn" data-maximize="reflection-txt-notepad-3">□</button><button aria-label="Close" class="win-btn" data-close="reflection-txt-notepad-3">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span></div>
-<div class="window-content"><div class="inset" contenteditable="true" spellcheck="true">
+<div class="window-content"><div class="inset" spellcheck="true">
 <h1>REFLECTION.exe</h1>
 <p class="hint">This was MY presentation</p>
 <p><em>[~]$ whoami</em></p>
@@ -114,10 +108,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_01.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-01-jpg-picture--4">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-01-jpg-picture--4">□</button><button aria-label="Close" class="win-btn" data-close="artifact-01-jpg-picture--4">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_01.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_01.jpg"/>
-<div class="caption" contenteditable="true">Baby Picture — Yeah, a picture of me as a baby, why? Not only it represents my humble beginnings, but it also shows a pattern of observe-do, were we born knowing to smile? Or did we learn from seeing? Not to make this a Nature vs Nurture debate, I was actually really looking for another picture where I have my face full of cake, what I meant through this object was to show my exploration as a baby, the observation I see as a first phase of the narrative.</div>
+<img alt="Baby photograph" src="assets/artifacts/artifact_01.JPG"/>
+<div class="caption">Baby Picture — Yeah, a picture of me as a baby, why? Not only it represents my humble beginnings, but it also shows a pattern of observe-do, were we born knowing to smile? Or did we learn from seeing? Not to make this a Nature vs Nurture debate, I was actually really looking for another picture where I have my face full of cake, what I meant through this object was to show my exploration as a baby, the observation I see as a first phase of the narrative.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -125,10 +117,8 @@
 <div class="titlebar"><span class="mini-icon">🌐</span><span class="title">Observation.html — Internet Explorer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="observation-html-interne-5">_</button><button aria-label="Maximize" class="win-btn" data-maximize="observation-html-interne-5">□</button><button aria-label="Close" class="win-btn" data-close="observation-html-interne-5">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/observation.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/observation.png"/>
-<div class="caption" contenteditable="true">Observation — As a first phase to the literacy narrative I show in the digital space, I chose Observation, we are all born, regardless of our capabilities (able to observe does not mean able to see specifically...) the ability of observation, we see, we do, we recognize patterns, we generate thoughts.<br/><a href="Observation.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
+<img alt="Observation photograph" src="assets/artifacts/observation.png"/>
+<div class="caption">Observation — As a first phase to the literacy narrative I show in the digital space, I chose Observation, we are all born, regardless of our capabilities (able to observe does not mean able to see specifically...) the ability of observation, we see, we do, we recognize patterns, we generate thoughts.<br/><a href="observation.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -136,10 +126,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_02.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-02-jpg-picture--6">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-02-jpg-picture--6">□</button><button aria-label="Close" class="win-btn" data-close="artifact-02-jpg-picture--6">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_02.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_02.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_02.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_02.png"/>
-<div class="caption" contenteditable="true">Old DVD — I didn't watch The Goonies as a kid, I used this as an example during my presentation of how I personally observed and reproduced the observations, I used to watch a lot of movies on DVD (Meet the Robinsons and Cloudy with a chance of meatballs were some of my favorites back then), so I observed how my mom or dad would clean the discs if they didn't work, I, as a child, would try to clean them myself a lot of times, my mom recalls they would end up working even worse every time i would "clean" them with my clothes haha.</div>
+<img alt="Old DVD" src="assets/artifacts/artifact_02.PNG"/>
+<div class="caption">Old DVD — I didn't watch The Goonies as a kid, I used this as an example during my presentation of how I personally observed and reproduced the observations, I used to watch a lot of movies on DVD (Meet the Robinsons and Cloudy with a chance of meatballs were some of my favorites back then), so I observed how my mom or dad would clean the discs if they didn't work, I, as a child, would try to clean them myself a lot of times, my mom recalls they would end up working even worse every time i would "clean" them with my clothes haha.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -147,10 +135,8 @@
 <div class="titlebar"><span class="mini-icon">🌐</span><span class="title">Curiosity.html — Internet Explorer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="curiosity-html-internet--7">_</button><button aria-label="Maximize" class="win-btn" data-maximize="curiosity-html-internet--7">□</button><button aria-label="Close" class="win-btn" data-close="curiosity-html-internet--7">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/curiosity.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/curiosity.png"/>
-<div class="caption" contenteditable="true">Curiosity — I explain, in my presentation, that observation becomes curiosity right when we are able to remember, we become computers learning to do and wondering how to do, we make nodes on what hurts and what doesn't, what burns and what is cold, and may I say, a curious child learns quickly, and learns a lot, which was a bit of my personal experience, my mother recalls me as a toddler saying my first word in a second language for example, all because I was curious to know what those funny symbols meant.<br/><a href="Curiosity.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
+<img alt="Curiosity photograph" src="assets/artifacts/curiosity.png"/>
+<div class="caption">Curiosity — I explain, in my presentation, that observation becomes curiosity right when we are able to remember, we become computers learning to do and wondering how to do, we make nodes on what hurts and what doesn't, what burns and what is cold, and may I say, a curious child learns quickly, and learns a lot, which was a bit of my personal experience, my mother recalls me as a toddler saying my first word in a second language for example, all because I was curious to know what those funny symbols meant.<br/><a href="curiosity.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -158,10 +144,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_03.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-03-jpg-picture--8">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-03-jpg-picture--8">□</button><button aria-label="Close" class="win-btn" data-close="artifact-03-jpg-picture--8">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_03.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_03.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_03.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_03.jpg"/>
-<div class="caption" contenteditable="true">Old Wooden Chicken Toy — This was the oldest thing from my childhood I found in the house I'm living at, a mechanical wooden toy, a pan with chickens on top, corn on the middle, all chickens connected by strings to a pendulum below the pan that, if moved, would make the chickens "eat" the corn; I explained how I was so curious as a toddler to why did they moved that I explored the toy thoroughly at the point of breaking it a little, until I found out it was the string that, when pulled, would move the toy. It might sound exxagerated, but this is an instance of a toddler learning about mechanics.</div>
+<img alt="Wooden chicken toy" src="assets/artifacts/artifact_03.jpg"/>
+<div class="caption">Old Wooden Chicken Toy — This was the oldest thing from my childhood I found in the house I'm living at, a mechanical wooden toy, a pan with chickens on top, corn on the middle, all chickens connected by strings to a pendulum below the pan that, if moved, would make the chickens "eat" the corn; I explained how I was so curious as a toddler to why did they moved that I explored the toy thoroughly at the point of breaking it a little, until I found out it was the string that, when pulled, would move the toy. It might sound exxagerated, but this is an instance of a toddler learning about mechanics.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -169,10 +153,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_04.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-04-jpg-picture--9">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-04-jpg-picture--9">□</button><button aria-label="Close" class="win-btn" data-close="artifact-04-jpg-picture--9">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_04.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_04.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_04.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_04.jpg"/>
-<div class="caption" contenteditable="true">iPod Touch — In the same reasoning as to use the toy for example, I used the ipod to explain that I was also curious about technology at the time, especially touch, the thing moved when i touched it, why not? Jokes on you, I'm a CS major now.</div>
+<img alt="iPod Touch" src="assets/artifacts/artifact_04.JPG"/>
+<div class="caption">iPod Touch — In the same reasoning as to use the toy for example, I used the ipod to explain that I was also curious about technology at the time, especially touch, the thing moved when i touched it, why not? Jokes on you, I'm a CS major now.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -180,10 +162,8 @@
 <div class="titlebar"><span class="mini-icon">🌐</span><span class="title">School.html — Internet Explorer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="school-html-internet-exp-10">_</button><button aria-label="Maximize" class="win-btn" data-maximize="school-html-internet-exp-10">□</button><button aria-label="Close" class="win-btn" data-close="school-html-internet-exp-10">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/school.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/school.png"/>
-<div class="caption" contenteditable="true">School — This is when the presentation turns from where it was going, all the glowing magic left, I parodied school platforms and websites like powerschool, blackboard, canvas, brightspace, etc. This part is meant to symbolize the loss of purpose, you are still curious, but forced to be curious about only a certain amount of things in a quite tedious agenda, maybe if you are a good learner or much curious you are good at it at first, but there may be some decay. This section is the most personal out of others I believem because it is mostly an experience of mine, I don't know ifothers had the same, I was curious, I was smart, but I didn't really have much of a reason why to learn all those boring topics, at one point of my growth, I started questioning myself, and so did my family: where did that child go?<br/><a href="School.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
+<img alt="School photograph" src="assets/artifacts/school.png"/>
+<div class="caption">School — This is when the presentation turns from where it was going, all the glowing magic left, I parodied school platforms and websites like powerschool, blackboard, canvas, brightspace, etc. This part is meant to symbolize the loss of purpose, you are still curious, but forced to be curious about only a certain amount of things in a quite tedious agenda, maybe if you are a good learner or much curious you are good at it at first, but there may be some decay. This section is the most personal out of others I believem because it is mostly an experience of mine, I don't know ifothers had the same, I was curious, I was smart, but I didn't really have much of a reason why to learn all those boring topics, at one point of my growth, I started questioning myself, and so did my family: where did that child go?<br/><a href="school.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -191,10 +171,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_05.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-05-jpg-picture--11">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-05-jpg-picture--11">□</button><button aria-label="Close" class="win-btn" data-close="artifact-05-jpg-picture--11">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_05.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_05.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_05.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_05.jpg"/>
-<div class="caption" contenteditable="true">Old and Newer Grades — A print of my transcript by 3rd grade, all 9s and 10s, impressive eh? That would change one time and another, the second grade (newer from sophomore year) has a fun story in it, it was such a good job, but made invalid by school protocols, that my teacher had to give me a 50/100 for it, seems bad on print, but it actually shows a good performance! lol, I didn't mention  that on my presentation, I just needed some contrasts.</div>
+<img alt="School grades" src="assets/artifacts/artifact_05.jpg"/>
+<div class="caption">Old and Newer Grades — A print of my transcript by 3rd grade, all 9s and 10s, impressive eh? That would change one time and another, the second grade (newer from sophomore year) has a fun story in it, it was such a good job, but made invalid by school protocols, that my teacher had to give me a 50/100 for it, seems bad on print, but it actually shows a good performance! lol, I didn't mention  that on my presentation, I just needed some contrasts.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -202,10 +180,8 @@
 <div class="titlebar"><span class="mini-icon">🌐</span><span class="title">Passion.html — Internet Explorer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="passion-html-internet-ex-12">_</button><button aria-label="Maximize" class="win-btn" data-maximize="passion-html-internet-ex-12">□</button><button aria-label="Close" class="win-btn" data-close="passion-html-internet-ex-12">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/passion.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/passion.png"/>
-<div class="caption" contenteditable="true">Passion — The presentation breaks, literally breaks! you are finally free, not because there was no more school, but because it went from something monochromatic to something you loved, and not only school, but learning in general, everything seems so awesome it is worth learning! You become curious again, all those boring stories from spanish class seem so epic! You start visualizing math and getting pleasure of solving! you start experimenting, gaining passion of everything in a chain reaction, all of a sudden, you love learning... You feel like you're unstoppable, you can know everything...<br/><a href="Passion.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
+<img alt="Passion photograph" src="assets/artifacts/passion.png"/>
+<div class="caption">Passion — The presentation breaks, literally breaks! you are finally free, not because there was no more school, but because it went from something monochromatic to something you loved, and not only school, but learning in general, everything seems so awesome it is worth learning! You become curious again, all those boring stories from spanish class seem so epic! You start visualizing math and getting pleasure of solving! you start experimenting, gaining passion of everything in a chain reaction, all of a sudden, you love learning... You feel like you're unstoppable, you can know everything...<br/><a href="passion.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -213,10 +189,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_06.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-06-jpg-picture--13">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-06-jpg-picture--13">□</button><button aria-label="Close" class="win-btn" data-close="artifact-06-jpg-picture--13">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_06.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_06.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_06.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_06.jpg"/>
-<div class="caption" contenteditable="true">Nintendo Switch Pro Controller (Splatoon 2 Edition) — I used the controller to portray the fact that I used to watch a lot of movies and play a lot of games during my childhood, during my life I always wondered "what if I made those?", and in the case of games, different from movies, I ahd to learn programming and math, therefore, I found a reason why to learn something new, and once again, I nowadays am a CS major! <br/> I learned English by playing games too by the way! when I was younger, this was something little I mentioned during my presentation <br/> Plus... Splatoon might be one of my favorite games ever, played it when I was 11 and I have quite some memories around it, not only of the game, but everything that went around when I started playing and telling my friends about it...</div>
+<img alt="Nintendo Switch Pro Controller" src="assets/artifacts/artifact_06.JPG"/>
+<div class="caption">Nintendo Switch Pro Controller (Splatoon 2 Edition) — I used the controller to portray the fact that I used to watch a lot of movies and play a lot of games during my childhood, during my life I always wondered "what if I made those?", and in the case of games, different from movies, I ahd to learn programming and math, therefore, I found a reason why to learn something new, and once again, I nowadays am a CS major! <br/> I learned English by playing games too by the way! when I was younger, this was something little I mentioned during my presentation <br/> Plus... Splatoon might be one of my favorite games ever, played it when I was 11 and I have quite some memories around it, not only of the game, but everything that went around when I started playing and telling my friends about it...</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -224,10 +198,8 @@
 <div class="titlebar"><span class="mini-icon">🌐</span><span class="title">Questioning.html — Internet Explorer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="questioning-html-interne-14">_</button><button aria-label="Maximize" class="win-btn" data-maximize="questioning-html-interne-14">□</button><button aria-label="Close" class="win-btn" data-close="questioning-html-interne-14">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/questioning.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/questioning.png"/>
-<div class="caption" contenteditable="true">Questioning — But we don't know everything. We are stopped from out unstoppable nature for the thought of not being perfect, you start procrastinating, doubting your knowledge, what's the use of all this if I can't get it all? In the more personal manner, I do not usually finish projects after I start them for the fear of them not being perfect enough, or I procrastinate on them for the fact that "I still need to learn before proceeding" but never doing so because you never started... But is it really what must stop you? Maybe it is good to doubt about your knowledge for something better...<br/><a href="Questioning.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
+<img alt="Questioning photograph" src="assets/artifacts/questioning.png"/>
+<div class="caption">Questioning — But we don't know everything. We are stopped from out unstoppable nature for the thought of not being perfect, you start procrastinating, doubting your knowledge, what's the use of all this if I can't get it all? In the more personal manner, I do not usually finish projects after I start them for the fear of them not being perfect enough, or I procrastinate on them for the fact that "I still need to learn before proceeding" but never doing so because you never started... But is it really what must stop you? Maybe it is good to doubt about your knowledge for something better...<br/><a href="questioning.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -235,10 +207,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_07.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-07-jpg-picture--15">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-07-jpg-picture--15">□</button><button aria-label="Close" class="win-btn" data-close="artifact-07-jpg-picture--15">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_07.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_07.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_07.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_07.jpg"/>
-<div class="caption" contenteditable="true">Floppy Disk — A symbol of age, I used it more as a symbol of something that was once the peak of technology, all of a sudden turning obsolete, my reflection here was that it might seem obsolete, but its own lack inspired for the evolution of so many more technologies of the future, which leads us to the true purpose of learning: not perfection, evolution.</div>
+<img alt="Floppy disk" src="assets/artifacts/artifact_07.jpg"/>
+<div class="caption">Floppy Disk — A symbol of age, I used it more as a symbol of something that was once the peak of technology, all of a sudden turning obsolete, my reflection here was that it might seem obsolete, but its own lack inspired for the evolution of so many more technologies of the future, which leads us to the true purpose of learning: not perfection, evolution.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -246,10 +216,8 @@
 <div class="titlebar"><span class="mini-icon">🌐</span><span class="title">Present.html — Internet Explorer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="present-html-internet-ex-16">_</button><button aria-label="Maximize" class="win-btn" data-maximize="present-html-internet-ex-16">□</button><button aria-label="Close" class="win-btn" data-close="present-html-internet-ex-16">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/present.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/present.png"/>
-<div class="caption" contenteditable="true">The Present — This is my mind right now, a laboratory where I am able to explore my thoughts and ideas, the wish to learn everything, but the control to know there are some things I don't know, but isn't that the essence of learning? Isn't that the reason why we keep experimenting? For me, this section is full of stuff I know and love, art, technology, science, I may not know much, but I try, not everything I do has to be useful or great, but something even greater can come from just liberating your mind and learning on the march.<br/><a href="Present.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
+<img alt="Present-day laboratory artwork" src="assets/artifacts/present.png"/>
+<div class="caption">The Present — This is my mind right now, a laboratory where I am able to explore my thoughts and ideas, the wish to learn everything, but the control to know there are some things I don't know, but isn't that the essence of learning? Isn't that the reason why we keep experimenting? For me, this section is full of stuff I know and love, art, technology, science, I may not know much, but I try, not everything I do has to be useful or great, but something even greater can come from just liberating your mind and learning on the march.<br/><a href="present.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -257,10 +225,8 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_08.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-08-jpg-picture--17">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-08-jpg-picture--17">□</button><button aria-label="Close" class="win-btn" data-close="artifact-08-jpg-picture--17">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_08.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_08.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_08.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_08.jpg"/>
-<div class="caption" contenteditable="true">Yearbook — Self-explanatory, this was my latest step before college, where i am right now, there is a lot i learned last year and I don't doubt the same will happen this one.</div>
+<img alt="Yearbook" src="assets/artifacts/artifact_08.jpg"/>
+<div class="caption">Yearbook — Self-explanatory, this was my latest step before college, where i am right now, there is a lot i learned last year and I don't doubt the same will happen this one.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -268,10 +234,8 @@
 <div class="titlebar"><span class="mini-icon">🌐</span><span class="title">Lifelong.html — Internet Explorer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="lifelong-html-internet-e-18">_</button><button aria-label="Maximize" class="win-btn" data-maximize="lifelong-html-internet-e-18">□</button><button aria-label="Close" class="win-btn" data-close="lifelong-html-internet-e-18">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_01.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_01.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/lifelong.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/lifelong.png"/>
-<div class="caption" contenteditable="true">Beyond Today — The future, I see the future as something uncertain, unwritten but writable upon the possibilities of its branches, I based myself on the TVA from Loki (2021) to make the interface of this section to represent the future as brances of infinite possibilities coming from my present, i could be anything in the future or no future at all! and that's the main motivator for the present, the unknown from the future, but a clear path of what you want, and what I want is to leave a print of mine as big as I can on this world for the good of mankind and all living things...<br/><a href="Curiosity.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
+<img alt="Lifelong learning artwork" src="assets/artifacts/lifelong.png"/>
+<div class="caption">Beyond Today — The future, I see the future as something uncertain, unwritten but writable upon the possibilities of its branches, I based myself on the TVA from Loki (2021) to make the interface of this section to represent the future as brances of infinite possibilities coming from my present, i could be anything in the future or no future at all! and that's the main motivator for the present, the unknown from the future, but a clear path of what you want, and what I want is to leave a print of mine as big as I can on this world for the good of mankind and all living things...<br/><a href="lifelong.html"><h2>&gt;&gt; Visit this Section!</h2></a></div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -279,17 +243,15 @@
 <div class="titlebar"><span class="mini-icon">🖼️</span><span class="title">artifact_09.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="artifact-09-jpg-picture--19">_</button><button aria-label="Maximize" class="win-btn" data-maximize="artifact-09-jpg-picture--19">□</button><button aria-label="Close" class="win-btn" data-close="artifact-09-jpg-picture--19">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your image at assets/artifacts/artifact_09.jpg, or change this src to your filename. -->
-<div class="image-placeholder" data-placeholder="artifact_09.jpg"><div><strong>IMAGE PLACEHOLDER</strong><br/><br/>Put your image in<br/><code>assets/artifacts/artifact_09.jpg</code><br/>then set the img src below.</div></div>
-<img alt="Artifact photograph" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/artifact_09.png"/>
-<div class="caption" contenteditable="true">Latent image — The only thing i could think of honestly, its not something of my belonging, nor i know it, i got it from internet, however, latent images are those images taken from old cameras which were still not revealed until light or chemicals hit them, so you dont know what it is right now, it'll be revealed as time goes...</div>
+<img alt="Final artifact photograph" src="assets/artifacts/artifact_09.PNG"/>
+<div class="caption">Latent image — The only thing i could think of honestly, its not something of my belonging, nor i know it, i got it from internet, however, latent images are those images taken from old cameras which were still not revealed until light or chemicals hit them, so you dont know what it is right now, it'll be revealed as time goes...</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
 <section aria-label="Reflection text window" class="window" id="reflection-txt-notepad-20" style="--x:5%;--y:4600px;--w:500px;--h:380px">
 <div class="titlebar"><span class="mini-icon">📝</span><span class="title">Reflection.txt — Notepad</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="reflection-txt-notepad-20">_</button><button aria-label="Maximize" class="win-btn" data-maximize="reflection-txt-notepad-20">□</button><button aria-label="Close" class="win-btn" data-close="reflection-txt-notepad-20">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span></div>
-<div class="window-content"><div class="inset" contenteditable="true" spellcheck="true">
+<div class="window-content"><div class="inset" spellcheck="true">
 <h1>REFLECTION.exe</h1>
 <p class="hint">Who else?</p>
 <p><em>[~]$ mkdir friends</em></p>
@@ -302,10 +264,8 @@
 <div class="titlebar"><span class="mini-icon">📷</span><span class="title">presentation.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="presentation-jpg-picture-21">_</button><button aria-label="Maximize" class="win-btn" data-maximize="presentation-jpg-picture-21">□</button><button aria-label="Close" class="win-btn" data-close="presentation-jpg-picture-21">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your presentation photo at assets/artifacts/presentation.jpg, or change this src. -->
-<div class="image-placeholder" data-placeholder="presentation.jpg"><div><strong>PRESENTATION PHOTO</strong><br/><br/>Put your photo in<br/><code>assets/artifacts/presentation.jpg</code></div></div>
-<img alt="Photograph of my class presentation" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/presentation1.jpg"/>
-<div class="caption" contenteditable="true">Sammy's presentation — I was quite impressed by this one because contrary to others, she didn't focus on showing growth through the means or proof (result, achievement) that would at some point prove me right that learning is a determined multifacetal process; instead, she focused on her passion: conjunto music. Being the vocalist of Conjunto La Tradicion at her High School, she summarized her pathway of learning focused on that activity specifically, showcasing her 4-year long growth starting from JV to being a Senior and even in college still being passionste about music. Definitely a new perspective to me, specially considering i did not know there was competitive music as a sport in South Texas!</div>
+<img alt="Sammy's class presentation" src="assets/artifacts/presentation1.png"/>
+<div class="caption">Sammy's presentation — I was quite impressed by this one because contrary to others, she didn't focus on showing growth through the means or proof (result, achievement) that would at some point prove me right that learning is a determined multifacetal process; instead, she focused on her passion: conjunto music. Being the vocalist of Conjunto La Tradicion at her High School, she summarized her pathway of learning focused on that activity specifically, showcasing her 4-year long growth starting from JV to being a Senior and even in college still being passionste about music. Definitely a new perspective to me, specially considering i did not know there was competitive music as a sport in South Texas!</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -313,10 +273,8 @@
 <div class="titlebar"><span class="mini-icon">📷</span><span class="title">presentation.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="presentation-jpg-picture-22">_</button><button aria-label="Maximize" class="win-btn" data-maximize="presentation-jpg-picture-22">□</button><button aria-label="Close" class="win-btn" data-close="presentation-jpg-picture-22">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your presentation photo at assets/artifacts/presentation.jpg, or change this src. -->
-<div class="image-placeholder" data-placeholder="presentation.jpg"><div><strong>PRESENTATION PHOTO</strong><br/><br/>Put your photo in<br/><code>assets/artifacts/presentation.jpg</code></div></div>
-<img alt="Photograph of my class presentation" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/presentation2.jpg"/>
-<div class="caption" contenteditable="true">Cruz's presentation — A Vet Assistant with lots of pictures with kitties, couldn't help to find it so cute! His presentation focused more on growth through achievements, he showed his certifications, FFA titles, math prizes, poetry prizes. Definitely surprised me what someone can do in four years (maybe more than myself...), this was a quite good balance between showing the proof of learning and appearing passionate about something specific, all shown in little books with kittens as covers.</div>
+<img alt="Cruz's class presentation" src="assets/artifacts/presentation2.png"/>
+<div class="caption">Cruz's presentation — A Vet Assistant with lots of pictures with kitties, couldn't help to find it so cute! His presentation focused more on growth through achievements, he showed his certifications, FFA titles, math prizes, poetry prizes. Definitely surprised me what someone can do in four years (maybe more than myself...), this was a quite good balance between showing the proof of learning and appearing passionate about something specific, all shown in little books with kittens as covers.</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
@@ -324,17 +282,15 @@
 <div class="titlebar"><span class="mini-icon">📷</span><span class="title">presentation.jpg — Picture Viewer</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="presentation-jpg-picture-23">_</button><button aria-label="Maximize" class="win-btn" data-maximize="presentation-jpg-picture-23">□</button><button aria-label="Close" class="win-btn" data-close="presentation-jpg-picture-23">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>V</u>iew</span><span><u>I</u>mage</span><span><u>H</u>elp</span></div>
 <div class="window-content"><div class="image-frame">
-<!-- Put your presentation photo at assets/artifacts/presentation.jpg, or change this src. -->
-<div class="image-placeholder" data-placeholder="presentation.jpg"><div><strong>PRESENTATION PHOTO</strong><br/><br/>Put your photo in<br/><code>assets/artifacts/presentation.jpg</code></div></div>
-<img alt="Photograph of my class presentation" hidden="" onerror="this.hidden=true" onload="this.hidden=false;this.previousElementSibling.hidden=true" src="assets/artifacts/presentation3.jpg"/>
-<div class="caption" contenteditable="true">Jared's presentation — future medic and graphic designer for fun, i really liked the format he chose for his presentation, just as mine, mixed... Except that it was different, this student organized it in the pathway of his freshman year represented in a music album (by Tame Impala, which I love too by the way!!!) as well as a lifetime pathway of books as the means of learning (specially medical books he was really interested on surprisingly), he also made a little extra by showing me his awesome graphic designs! Definitely worth seeing it all, this was the first I walked to as well, seemed like he had a lot to tell, don't we all?</div>
+<img alt="Jared's class presentation" src="assets/artifacts/presentation3.png"/>
+<div class="caption">Jared's presentation — future medic and graphic designer for fun, i really liked the format he chose for his presentation, just as mine, mixed... Except that it was different, this student organized it in the pathway of his freshman year represented in a music album (by Tame Impala, which I love too by the way!!!) as well as a lifetime pathway of books as the means of learning (specially medical books he was really interested on surprisingly), he also made a little extra by showing me his awesome graphic designs! Definitely worth seeing it all, this was the first I walked to as well, seemed like he had a lot to tell, don't we all?</div>
 </div></div>
 <div class="statusbar"><span>1 image</span><span class="status-chip">100%</span></div>
 </section>
 <section aria-label="Reflection text window" class="window" id="reflection-txt-notepad-24" style="--x:5%;--y:5980px;--w:500px;--h:380px">
 <div class="titlebar"><span class="mini-icon">📝</span><span class="title">Reflection.txt — Notepad</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="reflection-txt-notepad-24">_</button><button aria-label="Maximize" class="win-btn" data-maximize="reflection-txt-notepad-24">□</button><button aria-label="Close" class="win-btn" data-close="reflection-txt-notepad-24">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span></div>
-<div class="window-content"><div class="inset" contenteditable="true" spellcheck="true">
+<div class="window-content"><div class="inset" spellcheck="true">
 <h1>REFLECTION.exe</h1>
 <p class="hint">The End?</p>
 <p><em>[~]$ git commit -m "minor changes"</em></p>
@@ -345,14 +301,21 @@
 <section aria-label="Reflection text window" class="window" id="reflection-txt-notepad-25" style="--x:24%;--y:6460px;--w:540px;--h:220px">
 <div class="titlebar"><span class="mini-icon">📝</span><span class="title">Reflection.txt — Notepad</span><div class="win-controls"><button aria-label="Minimize" class="win-btn" data-minimize="reflection-txt-notepad-25">_</button><button aria-label="Maximize" class="win-btn" data-maximize="reflection-txt-notepad-25">□</button><button aria-label="Close" class="win-btn" data-close="reflection-txt-notepad-25">×</button></div></div>
 <div class="menu-strip"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>S</u>earch</span><span><u>H</u>elp</span></div>
-<div class="window-content"><div class="inset" contenteditable="true" spellcheck="true">
+<div class="window-content"><div class="inset" spellcheck="true">
 <p><em>Around here, however, we don't look backwards for very long.<br/>We <b>keep moving forward,</b> opening up new doors and doing new things, because we are curious... and curiosity keeps leading us down new paths.</em><br/>--Walt Disney</p>
 </div></div>
 <div class="statusbar"><span>Ln 1, Col 1</span><span class="status-chip">Windows 95 Notepad style</span></div>
 </section>
-
 </div><!-- /workspace-canvas -->
 </main><!-- /workspace -->
+<aside aria-label="Music player" class="music-player" id="musicPlayer">
+<div class="music-titlebar" id="musicDragHandle"><span>🎵</span><strong>Media Player</strong><div class="music-window-controls"><button aria-label="Minimize player" class="win-btn" id="musicMinimize">_</button><button aria-label="Expand player" class="win-btn" id="musicExpand">□</button></div></div>
+<div class="music-body" id="musicBody">
+<img alt="Album cover" class="album-art" src="assets/music/album.JPG"/>
+<div class="music-details"><strong id="trackTitle">Never Meant to Know -- Tally Hall</strong><span id="trackArtist">my fav song btw (for now or ever)</span><div class="music-controls"><button aria-label="Previous track" class="classic-btn" id="musicPrev">|◀</button><button aria-label="Play" class="classic-btn" id="musicPlay">▶</button><button aria-label="Pause" class="classic-btn" id="musicPause">Ⅱ</button><button aria-label="Next track" class="classic-btn" id="musicNext">▶|</button></div><div class="track-progress"><span id="musicCurrent">0:00</span><input aria-label="Track position" id="musicSeek" max="100" min="0" type="range" value="0"/><span id="musicDuration">0:00</span></div></div>
+</div>
+<audio id="reflectionAudio" preload="metadata" loop><source src="assets/music/reflection.mp3" type="audio/mpeg"/></audio>
+</aside>
 <div class="start-menu" id="startMenu">
 <div class="start-head">Windows 95</div>
 
@@ -362,14 +325,7 @@
 <hr class="start-separator"/>
 <button class="start-entry" data-open="reflection-txt-notepad-1"><span>📝</span> Opening reflection</button><button class="start-entry" data-open="presentation-jpg-picture-2"><span>📷</span> My presentation</button><button class="start-entry" data-open="artifact-03-jpg-picture--8"><span>🧸</span> Childhood &amp; curiosity</button><button class="start-entry" data-open="lifelong-html-internet-e-18"><span>🌐</span> Learning timeline</button><button class="start-entry" id="aboutButton"><span>💿</span> About REFLECTION.exe</button>
 </div>
-<aside aria-label="Fixed music player" class="music-player" id="musicPlayer">
-<div class="music-titlebar" id="musicDragHandle"><span>🎵</span><strong>Media Player</strong><div class="music-window-controls"><button aria-label="Minimize player" class="win-btn" id="musicMinimize">_</button><button aria-label="Expand player" class="win-btn" id="musicExpand">□</button></div></div>
-<div class="music-body" id="musicBody">
-<img alt="Album cover" class="album-art" onerror="this.style.visibility='hidden'" src="assets/music/album.jpg"/>
-<div class="music-details"><strong id="trackTitle">Never Meant to Know -- Tally Hall</strong><span id="trackArtist">Probably my favorite song (for now or ever)</span><div class="music-controls"><button aria-label="Previous track" class="classic-btn" id="musicPrev">|◀</button><button aria-label="Play" class="classic-btn" id="musicPlay">▶</button><button aria-label="Pause" class="classic-btn" id="musicPause">Ⅱ</button><button aria-label="Next track" class="classic-btn" id="musicNext">▶|</button></div><div class="track-progress"><span id="musicCurrent">0:00</span><input aria-label="Track position" id="musicSeek" max="100" min="0" type="range" value="0"/><span id="musicDuration">0:00</span></div></div>
-</div>
-<audio id="reflectionAudio" preload="metadata" loop><source src="assets/music/reflection.mp3" type="audio/mpeg"/></audio>
-</aside><div class="taskbar">
+<button class="classic-btn music-mini" id="musicRestore" hidden>🎵 Restore player</button><div class="taskbar">
 <button class="classic-btn start-button" id="startButton"><span class="start-logo">🪟</span> Start</button>
 <div class="task-divider"></div><div class="task-items" id="taskItems"></div><div class="tray"><span id="clock">3:00 PM</span></div>
 </div>
@@ -387,8 +343,8 @@
    const title=win.querySelector('.title')?.textContent||win.id,task=document.createElement('button');task.className='classic-btn task-item';task.textContent=title;task.title='Show '+title;
    task.addEventListener('click',()=>{if(!win.classList.contains('hidden')&&activeWindow===win)minimizeWindow(win.id);else openWindow(win.id)});taskItems.appendChild(task);taskButtons.set(win,task);
    win.addEventListener('pointerdown',()=>focusWindow(win));const bar=win.querySelector('.titlebar');
-   bar.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;focusWindow(win);const rect=win.getBoundingClientRect(),crect=canvas.getBoundingClientRect();drag={win,pointerId:e.pointerId,dx:e.clientX-rect.left,dy:e.clientY-rect.top};bar.setPointerCapture(e.pointerId);e.preventDefault()});
-   bar.addEventListener('pointermove',e=>{if(!drag||drag.win!==win||drag.pointerId!==e.pointerId)return;const r=canvas.getBoundingClientRect(),maxX=canvas.clientWidth-win.offsetWidth,maxY=canvas.clientHeight-win.offsetHeight,x=Math.max(0,Math.min(maxX,e.clientX-r.left-drag.dx)),y=Math.max(0,Math.min(maxY,e.clientY-r.top-drag.dy));win.style.left=x+'px';win.style.top=y+'px';win.style.setProperty('--x',x+'px');win.style.setProperty('--y',y+'px')});
+   bar.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;focusWindow(win);const rect=win.getBoundingClientRect(),crect=canvas.getBoundingClientRect();drag={win,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,startLeft:rect.left-crect.left,startTop:rect.top-crect.top,translateX:Number(win.dataset.translateX||0),translateY:Number(win.dataset.translateY||0)};bar.setPointerCapture(e.pointerId);e.preventDefault()});
+   bar.addEventListener('pointermove',e=>{if(!drag||drag.win!==win||drag.pointerId!==e.pointerId)return;const maxX=canvas.clientWidth-win.offsetWidth-(drag.startLeft-drag.translateX),maxY=canvas.clientHeight-win.offsetHeight-(drag.startTop-drag.translateY),minX=-(drag.startLeft-drag.translateX),minY=-(drag.startTop-drag.translateY),x=Math.max(minX,Math.min(maxX,drag.translateX+e.clientX-drag.startX)),y=Math.max(minY,Math.min(maxY,drag.translateY+e.clientY-drag.startY));win.style.transform='translate('+x+'px, '+y+'px)';win.dataset.translateX=x;win.dataset.translateY=y});
    const end=()=>{if(drag&&drag.win===win)drag=null};bar.addEventListener('pointerup',end);bar.addEventListener('pointercancel',end);
  });
  document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',()=>openWindow(el.dataset.open)));
@@ -399,9 +355,8 @@
  document.getElementById('aboutButton').addEventListener('click',()=>{startMenu.classList.remove('open');alert('REFLECTION.exe\nA personal archive for The Learning Loop.\n\nScroll the desktop, drag windows, and use the taskbar to restore them.');});
  desktop.addEventListener('pointerdown',e=>{if(['desktop','workspace','workspaceCanvas'].includes(e.target.id))startMenu.classList.remove('open')});
  function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}updateClock();setInterval(updateClock,30000);
- document.querySelectorAll('.image-frame img').forEach(img=>{if(img.complete&&img.naturalWidth>0){img.hidden=false;img.previousElementSibling.hidden=true}});
  // Fixed player: add tracks to this list if you want previous/next to switch between multiple local files.
- const tracks=[{title:'Reflection soundtrack',artist:'The Learning Loop',src:'assets/music/reflection.mp3',cover:'assets/music/album.jpg'}];let trackIndex=0;
+ const tracks=[{title:'Never Meant to Know -- Tally Hall',artist:'my fav song btw (for now or ever)',src:'assets/music/reflection.mp3',cover:'assets/music/album.JPG'}];let trackIndex=0;
  const audio=document.getElementById('reflectionAudio'),player=document.getElementById('musicPlayer'),play=document.getElementById('musicPlay'),seek=document.getElementById('musicSeek');
  const fmt=n=>{if(!Number.isFinite(n))return '0:00';return Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0')};
  function loadTrack(i,autoplay=false){trackIndex=(i+tracks.length)%tracks.length;const t=tracks[trackIndex];audio.src=t.src;document.getElementById('trackTitle').textContent=t.title;document.getElementById('trackArtist').textContent=t.artist;const cover=document.querySelector('.album-art');cover.src=t.cover;cover.style.visibility='visible';audio.load();if(autoplay)audio.play().catch(()=>{});}
@@ -411,8 +366,8 @@
  audio.addEventListener('play',()=>play.textContent='▶');audio.addEventListener('pause',()=>play.textContent='▶');audio.addEventListener('timeupdate',()=>{if(audio.duration){seek.value=audio.currentTime/audio.duration*100;document.getElementById('musicCurrent').textContent=fmt(audio.currentTime)}});audio.addEventListener('loadedmetadata',()=>document.getElementById('musicDuration').textContent=fmt(audio.duration));
  seek.addEventListener('input',()=>{if(audio.duration)audio.currentTime=Number(seek.value)/100*audio.duration});
  document.getElementById('musicMinimize').addEventListener('click',()=>{player.classList.add('minimized');document.getElementById('musicRestore').hidden=false});document.getElementById('musicRestore').addEventListener('click',()=>{player.classList.remove('minimized');document.getElementById('musicRestore').hidden=true});document.getElementById('musicExpand').addEventListener('click',()=>player.classList.toggle('expanded'));
- // The fixed player can also be repositioned by its title bar without affecting the page scroll.
- const handle=document.getElementById('musicDragHandle');let pd=null;handle.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const r=player.getBoundingClientRect();pd={dx:e.clientX-r.left,dy:e.clientY-r.top,id:e.pointerId};handle.setPointerCapture(e.pointerId);});handle.addEventListener('pointermove',e=>{if(!pd||pd.id!==e.pointerId)return;player.style.left=Math.max(0,e.clientX-pd.dx)+'px';player.style.top=Math.max(0,e.clientY-pd.dy)+'px';player.style.right='auto';player.style.bottom='auto'});const stop=()=>pd=null;handle.addEventListener('pointerup',stop);handle.addEventListener('pointercancel',stop);
+ // The player stays fixed to the viewport and can be dragged anywhere within it.
+ const handle=document.getElementById('musicDragHandle');let pd=null;handle.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const r=player.getBoundingClientRect();pd={startX:e.clientX,startY:e.clientY,left:r.left,top:r.top,id:e.pointerId};handle.setPointerCapture(e.pointerId);});handle.addEventListener('pointermove',e=>{if(!pd||pd.id!==e.pointerId)return;const left=Math.max(0,Math.min(innerWidth-player.offsetWidth,pd.left+e.clientX-pd.startX)),top=Math.max(0,Math.min(innerHeight-player.offsetHeight,pd.top+e.clientY-pd.startY));player.style.left=left+'px';player.style.top=top+'px';player.style.right='auto';player.style.bottom='auto'});const stop=()=>pd=null;handle.addEventListener('pointerup',stop);handle.addEventListener('pointercancel',stop);
  loadTrack(0,false);
 })();
 </script>
